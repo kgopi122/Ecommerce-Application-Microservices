@@ -10,7 +10,7 @@ The project demonstrates a distributed e-commerce architecture with independentl
 |---|---|
 | Project Name | E-Commerce Microservices Application |
 | Developer | Kambhampati Gopi Sai |
-| GitHub | [@gsai122](https://github.com/gsai122) |
+| GitHub | [@kgopi122](https://github.com/kgopi122) |
 | Architecture | Microservices |
 | Backend | Java 21, Spring Boot |
 | Frontend | Next.js, React, TypeScript |
@@ -222,7 +222,7 @@ docker info
 Open PowerShell, Command Prompt, or a terminal and run:
 
 ```bash
-git clone https://github.com/gsai122/Ecommerce-Application-Microservices.git
+git clone https://github.com/kgopi122/Ecommerce-Application-Microservices.git
 ```
 
 Navigate to the project directory:
@@ -593,9 +593,9 @@ Follow the existing code conventions and preserve the microservices architecture
 
 **Kambhampati Gopi Sai**
 
-GitHub: [@gsai122](https://github.com/gsai122)
+GitHub: [@kgopi122](https://github.com/kgopi122)
 
-Project repository: [E-Commerce Microservices Application](https://github.com/gsai122/Ecommerce-Application-Microservices)
+Project repository: [E-Commerce Microservices Application](https://github.com/kgopi122/Ecommerce-Application-Microservices)
 
 ---
 
