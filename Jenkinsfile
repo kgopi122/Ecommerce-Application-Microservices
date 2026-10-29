@@ -8,6 +8,7 @@ pipeline {
 
     options {
         timestamps()
+        disableConcurrentBuilds()
     }
 
     stages {
@@ -17,9 +18,9 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
+        stage('Build and Test All Services') {
             steps {
-                sh 'mvn -B -pl auth-service -am clean verify'
+                sh 'mvn -B clean verify'
             }
         }
     }
@@ -34,7 +35,7 @@ pipeline {
 
         success {
             archiveArtifacts(
-                artifacts: 'auth-service/target/auth-service-1.0-SNAPSHOT.jar',
+                artifacts: '**/target/*.jar,!**/target/*.jar.original',
                 fingerprint: true
             )
         }
