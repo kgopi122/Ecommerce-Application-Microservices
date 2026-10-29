@@ -1,0 +1,14 @@
+**/.next
+**/.next/**
+**/node_modules
+**/node_modules/**
+**/out
+**/out/**
+**/build
+**/build/**
+**/dist
+**/dist/**
+**/.turbo
+**/.turbo/**
+.git
+**/*.log

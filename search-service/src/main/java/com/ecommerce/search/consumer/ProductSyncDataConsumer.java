@@ -24,12 +24,22 @@ public class ProductSyncDataConsumer {
     public void listen(ConsumerRecord<?, ?> consumerRecord) {
 
         if (consumerRecord != null) {
-            JsonObject keyObject = new Gson().fromJson((String) consumerRecord.key(), JsonObject.class);
-            if (keyObject != null) {
-                JsonObject valueObject = new Gson().fromJson((String) consumerRecord.value(), JsonObject.class);
-                if (valueObject != null) {
-                    String action = String.valueOf(valueObject.get("op")).replaceAll("\"", "");
+            try {
+                Object rawKey = consumerRecord.key();
+                Object rawVal = consumerRecord.value();
+                if (rawKey == null || rawVal == null) {
+                    LOGGER.warn("Received Kafka record with null key or value on topic {}", consumerRecord.topic());
+                    return;
+                }
+
+                JsonObject keyObject = new Gson().fromJson(rawKey.toString(), JsonObject.class);
+                JsonObject valueObject = new Gson().fromJson(rawVal.toString(), JsonObject.class);
+
+                if (keyObject != null && keyObject.has("id") && valueObject != null && valueObject.has("op")) {
+                    String action = valueObject.get("op").getAsString().replaceAll("\"", "");
                     Long id = keyObject.get("id").getAsLong();
+
+                    LOGGER.info("Processing CDC event for product id: {}, action: {}", id, action);
 
                     switch (action) {
                         case Action.CREATE, Action.READ:
@@ -42,9 +52,14 @@ public class ProductSyncDataConsumer {
                             productSyncDataService.deleteProduct(id);
                             break;
                         default:
+                            LOGGER.warn("Unknown CDC action: {}", action);
                             break;
                     }
+                } else {
+                    LOGGER.warn("Kafka record payload missing 'id' or 'op' field: key={}, value={}", rawKey, rawVal);
                 }
+            } catch (Exception e) {
+                LOGGER.error("Error processing CDC event on topic {}: {}", consumerRecord.topic(), e.getMessage());
             }
         }
     }

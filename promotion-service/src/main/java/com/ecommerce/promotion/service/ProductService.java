@@ -29,59 +29,80 @@ public class ProductService extends AbstractCircuitBreakFallbackHandler {
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<ProductVm> getProductByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.requireJwt();
-        final URI url = UriComponentsBuilder
-            .fromHttpUrl(serviceUrlConfig.product())
-            .path("/backoffice/products/by-ids")
-            .queryParams(createIdParams(ids))
-            .build()
-            .toUri();
+        if (ids == null || ids.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        try {
+            String jwt = AuthenticationUtils.requireJwt();
+            final URI url = UriComponentsBuilder
+                .fromHttpUrl(serviceUrlConfig.product())
+                .path("/backoffice/products/by-ids")
+                .queryParams(createIdParams(ids))
+                .build()
+                .toUri();
 
-        return restClient.get()
-            .uri(url)
-            .headers(h -> h.setBearerAuth(jwt))
-            .retrieve()
-            .toEntity(new ParameterizedTypeReference<List<ProductVm>>() {
-            })
-            .getBody();
+            return restClient.get()
+                .uri(url)
+                .headers(h -> h.setBearerAuth(jwt))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<List<ProductVm>>() {
+                })
+                .getBody();
+        } catch (Exception e) {
+            return handleFallback(ids, e);
+        }
     }
 
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<CategoryGetVm> getCategoryByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.requireJwt();
-        final URI url = UriComponentsBuilder
-            .fromHttpUrl(serviceUrlConfig.product())
-            .path("/backoffice/categories/by-ids")
-            .queryParams(createIdParams(ids))
-            .build()
-            .toUri();
-        return restClient.get()
-            .uri(url)
-            .headers(h -> h.setBearerAuth(jwt))
-            .retrieve()
-            .toEntity(new ParameterizedTypeReference<List<CategoryGetVm>>() {
-            })
-            .getBody();
+        if (ids == null || ids.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        try {
+            String jwt = AuthenticationUtils.requireJwt();
+            final URI url = UriComponentsBuilder
+                .fromHttpUrl(serviceUrlConfig.product())
+                .path("/backoffice/categories/by-ids")
+                .queryParams(createIdParams(ids))
+                .build()
+                .toUri();
+            return restClient.get()
+                .uri(url)
+                .headers(h -> h.setBearerAuth(jwt))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<List<CategoryGetVm>>() {
+                })
+                .getBody();
+        } catch (Exception e) {
+            return handleFallback(ids, e);
+        }
     }
 
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<BrandVm> getBrandByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.requireJwt();
-        final URI url = UriComponentsBuilder
-            .fromHttpUrl(serviceUrlConfig.product())
-            .path("/backoffice/brands/by-ids")
-            .queryParams(createIdParams(ids))
-            .build()
-            .toUri();
-        return restClient.get()
-            .uri(url)
-            .headers(h -> h.setBearerAuth(jwt))
-            .retrieve()
-            .toEntity(new ParameterizedTypeReference<List<BrandVm>>() {
-            })
-            .getBody();
+        if (ids == null || ids.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        try {
+            String jwt = AuthenticationUtils.requireJwt();
+            final URI url = UriComponentsBuilder
+                .fromHttpUrl(serviceUrlConfig.product())
+                .path("/backoffice/brands/by-ids")
+                .queryParams(createIdParams(ids))
+                .build()
+                .toUri();
+            return restClient.get()
+                .uri(url)
+                .headers(h -> h.setBearerAuth(jwt))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<List<BrandVm>>() {
+                })
+                .getBody();
+        } catch (Exception e) {
+            return handleFallback(ids, e);
+        }
     }
 
     private static MultiValueMap<String, String> createIdParams(List<Long> ids) {

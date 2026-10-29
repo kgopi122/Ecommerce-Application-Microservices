@@ -13,7 +13,7 @@ interface ProductRailProps {
 }
 
 export default function ProductRail({
-  title, icon, products, href = "/products", viewAllLabel = "Xem tất cả",
+  title, icon, products, href = "/products", viewAllLabel = "View all",
 }: ProductRailProps) {
   return (
     <section className={s.section}>

@@ -1,5 +1,6 @@
 package com.ecommerce.shippingservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

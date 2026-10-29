@@ -5,6 +5,7 @@ services:
   postgres:
     image: postgres:16
     container_name: postgres
+    command: postgres -c max_connections=300
     environment:
       POSTGRES_DB: ecommerce
       POSTGRES_USER: ${POSTGRES_USER}
@@ -15,7 +16,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ecommerce"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -121,6 +122,8 @@ services:
       KC_DB_URL_DATABASE: keycloak
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HOSTNAME: "http://localhost:8080"
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "false"
     volumes:
       - ./docker/keycloak/import:/opt/keycloak/data/import:ro
     ports:
@@ -158,8 +161,8 @@ services:
       - ecommerce-network
 
   auth-service:
+    build: ./auth-service
     image: ghcr.io/hoangtien2k3/auth-service:latest
-    pull_policy: always
     container_name: auth-service
     ports:
       - "8088:8088"
@@ -167,7 +170,9 @@ services:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       KEYCLOAK_SERVER_URL: http://keycloak:8080
       KEYCLOAK_PUBLIC_SERVER_URL: ${KEYCLOAK_PUBLIC_SERVER_URL:-http://localhost:8080}
-      SSO_BACKEND_CALLBACK_URL: http://localhost:8088/api/v1/auth/callback
+      KEYCLOAK_CLIENT_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KEYCLOAK_CLIENT_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      SSO_BACKEND_CALLBACK_URL: http://localhost:8088/auth/api/v1/auth/callback
       SSO_DEFAULT_FRONTEND_REDIRECT: http://localhost:3000/auth/callback
       SSO_ALLOWED_REDIRECT_URIS: http://localhost:3000/auth/callback,http://localhost:3001/auth/callback
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
@@ -182,8 +187,8 @@ services:
       - ecommerce-network
 
   product-service:
+    build: ./product-service
     image: ghcr.io/hoangtien2k3/product-service:latest
-    pull_policy: always
     container_name: product-service
     ports:
       - "8086:8086"
@@ -195,12 +200,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   order-service:
+    build: ./order-service
     image: ghcr.io/hoangtien2k3/order-service:latest
-    pull_policy: always
     container_name: order-service
     ports:
       - "8084:8084"
@@ -210,17 +217,19 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_SERVERS: kafka:9092
+      PRODUCT_SERVICE_URL: http://product-service:8086/product
+      AUTH_SERVICE_URL: http://auth-service:8088
     depends_on:
       postgres:
         condition: service_healthy
-      kafka:
+      keycloak:
         condition: service_healthy
     networks:
       - ecommerce-network
 
   payment-service:
+    build: ./payment-service
     image: ghcr.io/hoangtien2k3/payment-service:latest
-    pull_policy: always
     container_name: payment-service
     ports:
       - "8085:8085"
@@ -230,17 +239,21 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_SERVERS: kafka:9092
+      ORDER_SERVICE_URL: http://order-service:8084/order
+      AUTH_SERVICE_URL: http://auth-service:8088
     depends_on:
       postgres:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   shipping-service:
+    build: ./shipping-service
     image: ghcr.io/hoangtien2k3/shipping-service:latest
-    pull_policy: always
     container_name: shipping-service
     ports:
       - "8087:8087"
@@ -249,15 +262,21 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PRODUCT_SERVICE_URL: http://product-service:8086/product
+      ORDER_SERVICE_URL: http://order-service:8084/order
+      PRODUCT_SERVICE_API_URL: http://product-service:8086/product/api/products
+      ORDER_SERVICE_API_URL: http://order-service:8084/order/api/orders
     depends_on:
       postgres:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       - ecommerce-network
 
   inventory-service:
+    build: ./inventory-service
     image: ghcr.io/hoangtien2k3/inventory-service:latest
-    pull_policy: always
     container_name: inventory-service
     ports:
       - "8082:8082"
@@ -269,12 +288,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   favourite-service:
+    build: ./favourite-service
     image: ghcr.io/hoangtien2k3/favourite-service:latest
-    pull_policy: always
     container_name: favourite-service
     ports:
       - "8081:8081"
@@ -286,12 +307,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   rating-service:
+    build: ./rating-service
     image: ghcr.io/hoangtien2k3/rating-service:latest
-    pull_policy: always
     container_name: rating-service
     ports:
       - "8089:8089"
@@ -303,12 +326,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   media-service:
+    build: ./media-service
     image: ghcr.io/hoangtien2k3/media-service:latest
-    pull_policy: always
     container_name: media-service
     ports:
       - "8083:8083"
@@ -321,8 +346,11 @@ services:
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
       STORAGE_BUCKET: ${STORAGE_BUCKET}
+      HOANGTIEN2K3_PUBLICURL: http://localhost:8083/media
     depends_on:
       postgres:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
       rustfs:
         condition: service_healthy
@@ -330,8 +358,8 @@ services:
       - ecommerce-network
 
   tax-service:
+    build: ./tax-service
     image: ghcr.io/hoangtien2k3/tax-service:latest
-    pull_policy: always
     container_name: tax-service
     ports:
       - "8091:8091"
@@ -343,12 +371,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   promotion-service:
+    build: ./promotion-service
     image: ghcr.io/hoangtien2k3/promotion-service:latest
-    pull_policy: always
     container_name: promotion-service
     ports:
       - "8093:8093"
@@ -360,12 +390,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   search-service:
+    build: ./search-service
     image: ghcr.io/hoangtien2k3/search-service:latest
-    pull_policy: always
     container_name: search-service
     ports:
       - "8094:8094"
@@ -375,17 +407,20 @@ services:
       ELASTICSEARCH_USERNAME: ""
       ELASTICSEARCH_PASSWORD: ""
       KAFKA_SERVERS: kafka:9092
+      ECOMMERCE_SERVICES_PRODUCT: http://product-service:8086
     depends_on:
       elasticsearch:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   notification-service:
+    build: ./notification-service
     image: ghcr.io/hoangtien2k3/notification-service:latest
-    pull_policy: always
     container_name: notification-service
     ports:
       - "8090:8090"
@@ -394,15 +429,18 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecommerce
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_SERVERS: kafka:9092
-      MAIL_USERNAME: ${MAIL_USERNAME}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@ecommerce.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     depends_on:
       postgres:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -411,8 +449,12 @@ services:
   # FRONTEND — Next.js
   # ============================================================
   frontend:
-    image: ghcr.io/hoangtien2k3/frontend:latest
-    pull_policy: always
+    build:
+      context: ./frontend
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:9080
+    image: ecommerce-frontend:latest
     container_name: frontend
     ports:
       - "3000:3000"

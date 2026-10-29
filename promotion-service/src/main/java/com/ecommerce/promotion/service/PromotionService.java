@@ -48,9 +48,9 @@ public class PromotionService {
                 .usageType(promotionPostVm.getUsageType())
                 .usageLimit(promotionPostVm.getUsageLimit())
                 .discountType(promotionPostVm.getDiscountType())
-                .discountPercentage(promotionPostVm.getDiscountPercentage())
-                .discountAmount(promotionPostVm.getDiscountAmount())
-                .isActive(promotionPostVm.isActive())
+                .discountPercentage(promotionPostVm.getDiscountPercentage() != null ? promotionPostVm.getDiscountPercentage() : 0L)
+                .discountAmount(promotionPostVm.getDiscountAmount() != null ? promotionPostVm.getDiscountAmount() : 0L)
+                .isActive(Boolean.TRUE.equals(promotionPostVm.getIsActive()))
                 .startDate(promotionPostVm.getStartDate().toInstant())
                 .endDate(promotionPostVm.getEndDate().toInstant())
                 .minimumOrderPurchaseAmount(promotionPostVm.getMinimumOrderPurchaseAmount())
@@ -80,9 +80,9 @@ public class PromotionService {
         promotion.setUsageLimit(promotionPutVm.getUsageLimit());
         promotion.setSlug(promotionPutVm.getSlug());
         promotion.setDiscountType(promotionPutVm.getDiscountType());
-        promotion.setDiscountPercentage(promotionPutVm.getDiscountPercentage());
-        promotion.setDiscountAmount(promotionPutVm.getDiscountAmount());
-        promotion.setIsActive(promotionPutVm.isActive());
+        promotion.setDiscountPercentage(promotionPutVm.getDiscountPercentage() != null ? promotionPutVm.getDiscountPercentage() : 0L);
+        promotion.setDiscountAmount(promotionPutVm.getDiscountAmount() != null ? promotionPutVm.getDiscountAmount() : 0L);
+        promotion.setIsActive(Boolean.TRUE.equals(promotionPutVm.getIsActive()));
         promotion.setStartDate(promotionPutVm.getStartDate().toInstant());
         promotion.setEndDate(promotionPutVm.getEndDate().toInstant());
         promotion.setMinimumOrderPurchaseAmount(promotionPutVm.getMinimumOrderPurchaseAmount());
@@ -105,13 +105,21 @@ public class PromotionService {
 
         Page<Promotion> promotionPage;
 
-        promotionPage = promotionRepository.findPromotions(
-            promotionName.trim(),
-            couponCode.trim(),
-            startDate,
-            endDate,
-            pageable
-        );
+        if (startDate == null || endDate == null) {
+            promotionPage = promotionRepository.findPromotions(
+                promotionName.trim(),
+                couponCode.trim(),
+                pageable
+            );
+        } else {
+            promotionPage = promotionRepository.findPromotionsWithDates(
+                promotionName.trim(),
+                couponCode.trim(),
+                startDate,
+                endDate,
+                pageable
+            );
+        }
 
         List<PromotionDetailVm> promotionDetailVmList = promotionPage
                 .getContent()

@@ -86,7 +86,7 @@ public class PaymentController {
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<PaymentDto> update(
             @PathVariable("paymentId")
-            @NotBlank(message = "Input must not be blank")
+            @NotNull(message = "Input must not be null")
             @Valid final Integer paymentId,
             @RequestBody
             @NotNull(message = "Input must not be NULL")

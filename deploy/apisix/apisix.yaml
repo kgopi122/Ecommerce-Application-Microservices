@@ -68,14 +68,22 @@ global_rules:
       key: remote_addr
       policy: local
 routes:
+# -----------------------------------------------------------------------------
+# 1. PUBLIC ROUTES
+# -----------------------------------------------------------------------------
 - id: auth-public
   upstream_id: 1
-  uri: /api/v1/auth/*
+  uris:
+  - /api/v1/auth
+  - /api/v1/auth/*
+  - /auth/api/v1/auth
+  - /auth/api/v1/auth/*
   plugins:
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /auth/$1
+      - ^(/auth)?/(.*)
+      - /auth/$2
+
 - id: product-catalog
   upstream_id: 2
   uris:
@@ -83,31 +91,58 @@ routes:
   - /api/categories/*
   - /api/products
   - /api/products/*
+  - /product/api/categories
+  - /product/api/categories/*
+  - /product/api/products
+  - /product/api/products/*
   plugins:
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /product/$1
+      - ^(/product)?/(.*)
+      - /product/$2
+
 - id: rating-storefront
   upstream_id: 10
   uris:
   - /storefront/ratings
   - /storefront/ratings/*
+  - /rating/storefront/ratings
+  - /rating/storefront/ratings/*
   plugins:
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /rating/$1
+      - ^(/rating)?/(.*)
+      - /rating/$2
+
 - id: search-storefront
   upstream_id: 11
   uris:
   - /storefront/catalog-search
   - /storefront/search_suggest
+  - /search/storefront/catalog-search
+  - /search/storefront/search_suggest
   plugins:
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /search/$1
+      - ^(/search)?/(.*)
+      - /search/$2
+
+- id: media-public-get
+  upstream_id: 9
+  methods:
+  - GET
+  uris:
+  - /medias/*
+  - /media/medias/*
+  plugins:
+    proxy-rewrite:
+      regex_uri:
+      - ^(/media)?/(.*)
+      - /media/$2
+
+# -----------------------------------------------------------------------------
+# 2. OPENAPI DOCUMENTATION ROUTES
+# -----------------------------------------------------------------------------
 - id: openapi-auth
   upstream_id: 1
   uri: /auth/v3/api-docs/*
@@ -147,11 +182,17 @@ routes:
 - id: openapi-tax
   upstream_id: 13
   uri: /tax/v3/api-docs/*
+
+# -----------------------------------------------------------------------------
+# 3. PROTECTED ROUTES (OpenID Connect Token Verification)
+# -----------------------------------------------------------------------------
 - id: auth-roles
   upstream_id: 1
   uris:
   - /api/v1/roles
   - /api/v1/roles/*
+  - /auth/api/v1/roles
+  - /auth/api/v1/roles/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -163,13 +204,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /auth/$1
+      - ^(/auth)?/(.*)
+      - /auth/$2
+
 - id: auth-users
   upstream_id: 1
   uris:
   - /api/v1/users
   - /api/v1/users/*
+  - /auth/api/v1/users
+  - /auth/api/v1/users/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -181,13 +225,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /auth/$1
+      - ^(/auth)?/(.*)
+      - /auth/$2
+
 - id: order-carts
   upstream_id: 3
   uris:
   - /api/carts
   - /api/carts/*
+  - /order/api/carts
+  - /order/api/carts/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -199,13 +246,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /order/$1
+      - ^(/order)?/(.*)
+      - /order/$2
+
 - id: order-orders
   upstream_id: 3
   uris:
   - /api/orders
   - /api/orders/*
+  - /order/api/orders
+  - /order/api/orders/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -217,13 +267,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /order/$1
+      - ^(/order)?/(.*)
+      - /order/$2
+
 - id: payment
   upstream_id: 4
   uris:
   - /api/payments
   - /api/payments/*
+  - /payment/api/payments
+  - /payment/api/payments/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -235,13 +288,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /payment/$1
+      - ^(/payment)?/(.*)
+      - /payment/$2
+
 - id: inventory
   upstream_id: 5
   uris:
   - /api/inventory
   - /api/inventory/*
+  - /inventory/api/inventory
+  - /inventory/api/inventory/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -253,13 +309,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /inventory/$1
+      - ^(/inventory)?/(.*)
+      - /inventory/$2
+
 - id: favourite
   upstream_id: 7
   uris:
   - /api/favourites
   - /api/favourites/*
+  - /favourite/api/favourites
+  - /favourite/api/favourites/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -271,11 +330,16 @@ routes:
       token_signing_alg_values_expected: RS256
     proxy-rewrite:
       regex_uri:
-      - ^/(.*)
-      - /favourite/$1
+      - ^(/favourite)?/(.*)
+      - /favourite/$2
+
 - id: shipping
   upstream_id: 6
-  uri: /shipping/api/shippings/*
+  uris:
+  - /api/shippings
+  - /api/shippings/*
+  - /shipping/api/shippings
+  - /shipping/api/shippings/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -285,9 +349,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/shipping)?/(.*)
+      - /shipping/$2
+
 - id: notif-email
   upstream_id: 8
-  uri: /notification/api/email/*
+  uris:
+  - /api/email
+  - /api/email/*
+  - /notification/api/email
+  - /notification/api/email/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -297,9 +370,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/notification)?/(.*)
+      - /notification/$2
+
 - id: notif-notifications
   upstream_id: 8
-  uri: /notification/api/notifications/*
+  uris:
+  - /api/notifications
+  - /api/notifications/*
+  - /notification/api/notifications
+  - /notification/api/notifications/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -309,9 +391,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/notification)?/(.*)
+      - /notification/$2
+
 - id: notif-payment
   upstream_id: 8
-  uri: /notification/api/payment-notifications/*
+  uris:
+  - /api/payment-notifications
+  - /api/payment-notifications/*
+  - /notification/api/payment-notifications
+  - /notification/api/payment-notifications/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -321,9 +412,22 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
-- id: media
+    proxy-rewrite:
+      regex_uri:
+      - ^(/notification)?/(.*)
+      - /notification/$2
+
+- id: media-protected-write
   upstream_id: 9
-  uri: /media/medias/*
+  methods:
+  - POST
+  - PUT
+  - DELETE
+  uris:
+  - /medias
+  - /medias/*
+  - /media/medias
+  - /media/medias/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -333,9 +437,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/media)?/(.*)
+      - /media/$2
+
 - id: rating-backoffice
   upstream_id: 10
-  uri: /rating/backoffice/ratings/*
+  uris:
+  - /backoffice/ratings
+  - /backoffice/ratings/*
+  - /rating/backoffice/ratings
+  - /rating/backoffice/ratings/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -345,9 +458,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/rating)?/(.*)
+      - /rating/$2
+
 - id: promotion-backoffice
   upstream_id: 12
-  uri: /promotion/backoffice/promotions/*
+  uris:
+  - /backoffice/promotions
+  - /backoffice/promotions/*
+  - /promotion/backoffice/promotions
+  - /promotion/backoffice/promotions/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -357,9 +479,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/promotion)?/(.*)
+      - /promotion/$2
+
 - id: tax-classes
   upstream_id: 13
-  uri: /tax/backoffice/tax-classes/*
+  uris:
+  - /backoffice/tax-classes
+  - /backoffice/tax-classes/*
+  - /tax/backoffice/tax-classes
+  - /tax/backoffice/tax-classes/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -369,9 +500,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/tax)?/(.*)
+      - /tax/$2
+
 - id: tax-rates
   upstream_id: 13
-  uri: /tax/backoffice/tax-rates/*
+  uris:
+  - /backoffice/tax-rates
+  - /backoffice/tax-rates/*
+  - /tax/backoffice/tax-rates
+  - /tax/backoffice/tax-rates/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -381,4 +521,8 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^(/tax)?/(.*)
+      - /tax/$2
 #END

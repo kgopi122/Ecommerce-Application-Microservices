@@ -14,7 +14,8 @@ public class CallAPI {
     private final RestClient.Builder restClientBuilder;
 
     public UserDto receiverUserDto(Long userId, String token) {
-        return restClientBuilder.baseUrl("http://auth-service:8088").build()
+        String baseUrl = System.getenv().getOrDefault("AUTH_SERVICE_URL", "http://auth-service:8088");
+        return restClientBuilder.baseUrl(baseUrl).build()
                 .get()
                 .uri("/api/manager/user/{id}", userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -23,7 +24,8 @@ public class CallAPI {
     }
 
     public ProductDto receiverProductDto(Integer productId) {
-        return restClientBuilder.baseUrl("http://product-service:8086").build()
+        String baseUrl = System.getenv().getOrDefault("PRODUCT_SERVICE_URL", "http://product-service:8086/product");
+        return restClientBuilder.baseUrl(baseUrl).build()
                 .get()
                 .uri("/api/products/{id}", productId)
                 .retrieve()

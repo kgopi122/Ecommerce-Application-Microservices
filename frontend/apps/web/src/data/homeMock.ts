@@ -1,7 +1,4 @@
-// Mock data for the storefront homepage. The backend is not wired up yet, so the
-// homepage renders from these fixtures to showcase the full CellphoneS-style UI.
-// Swap each section over to its real `use*` hook once the corresponding service is
-// available — the card/section components already accept the live `Product` shape.
+// Mock data for the storefront homepage showcasing the full CellphoneS-style UI.
 
 export interface ShowcaseProduct {
   productId: number;
@@ -13,7 +10,7 @@ export interface ShowcaseProduct {
   rating?: number;
   sold?: number;
   stockTotal?: number; // for flash-sale progress bar
-  memberExtra?: number; // "Smember giảm thêm" amount
+  memberExtra?: number; // member discount amount
   installment?: boolean;
   badge?: string;
   category?: { categoryId: number; categoryTitle: string };
@@ -32,8 +29,6 @@ export interface BrandChip {
   href: string;
 }
 
-// NOTE: label-bearing items carry a translation `key` (resolved against the
-// next-intl messages) instead of hardcoded text. Only structural data lives here.
 export interface HeroSlide {
   id: number;
   key: string; // -> Home.{key}Title / Home.{key}Sub
@@ -50,7 +45,7 @@ export interface CategoryIcon {
 
 export interface BrandLogo {
   id: number;
-  name: string; // proper noun, not translated
+  name: string;
   href: string;
 }
 
@@ -98,39 +93,39 @@ export const brands: BrandLogo[] = [
 ];
 
 export const flashSaleProducts: ShowcaseProduct[] = [
-  { productId: 101, productTitle: "Điện thoại Galaxy A55 5G 8GB/256GB", priceUnit: 8490000, oldPrice: 10990000, discountPercent: 23, rating: 5, sold: 120, stockTotal: 150, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 102, productTitle: "Tai nghe Bluetooth chống ồn Pro 2", priceUnit: 4290000, oldPrice: 6490000, discountPercent: 34, rating: 5, sold: 340, stockTotal: 400, installment: false, category: { categoryId: 4, categoryTitle: "Âm thanh" } },
-  { productId: 103, productTitle: "Laptop UltraBook 14 inch i5/16GB/512GB", priceUnit: 15990000, oldPrice: 19990000, discountPercent: 20, rating: 4, sold: 56, stockTotal: 100, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 104, productTitle: "Đồng hồ thông minh Watch Active 3", priceUnit: 2990000, oldPrice: 4490000, discountPercent: 33, rating: 5, sold: 210, stockTotal: 250, installment: false, category: { categoryId: 5, categoryTitle: "Đồng hồ" } },
-  { productId: 105, productTitle: "Máy tính bảng Tab S9 11 inch 128GB", priceUnit: 11490000, oldPrice: 14990000, discountPercent: 23, rating: 4, sold: 88, stockTotal: 120, installment: true, category: { categoryId: 3, categoryTitle: "Tablet" } },
-  { productId: 106, productTitle: "Sạc dự phòng 20.000mAh PD 22.5W", priceUnit: 590000, oldPrice: 990000, discountPercent: 40, rating: 5, sold: 530, stockTotal: 600, installment: false, category: { categoryId: 9, categoryTitle: "Phụ kiện" } },
+  { productId: 101, productTitle: "Galaxy A55 5G Smartphone 8GB/256GB", imageUrl: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&auto=format&fit=crop&q=80", priceUnit: 349, oldPrice: 449, discountPercent: 22, rating: 5, sold: 120, stockTotal: 150, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 102, productTitle: "Pro 2 Noise-Cancelling Bluetooth Earbuds", imageUrl: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80", priceUnit: 179, oldPrice: 249, discountPercent: 28, rating: 5, sold: 340, stockTotal: 400, installment: false, category: { categoryId: 4, categoryTitle: "Audio" } },
+  { productId: 103, productTitle: "UltraBook 14-inch Laptop i5/16GB/512GB", imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80", priceUnit: 699, oldPrice: 849, discountPercent: 18, rating: 4, sold: 56, stockTotal: 100, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 104, productTitle: "Watch Active 3 Smartwatch (GPS + Heart Rate)", imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80", priceUnit: 129, oldPrice: 189, discountPercent: 32, rating: 5, sold: 210, stockTotal: 250, installment: false, category: { categoryId: 5, categoryTitle: "Watches" } },
+  { productId: 105, productTitle: "Galaxy Tab S9 11-inch Tablet 128GB Wi-Fi", imageUrl: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80", priceUnit: 499, oldPrice: 629, discountPercent: 21, rating: 4, sold: 88, stockTotal: 120, installment: true, category: { categoryId: 3, categoryTitle: "Tablets" } },
+  { productId: 106, productTitle: "Fast Charging Power Bank 20,000mAh PD 22.5W", imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80", priceUnit: 29, oldPrice: 49, discountPercent: 41, rating: 5, sold: 530, stockTotal: 600, installment: false, category: { categoryId: 9, categoryTitle: "Accessories" } },
 ];
 
 export const hotProducts: ShowcaseProduct[] = [
-  { productId: 201, productTitle: "Điện thoại Galaxy S24 Ultra 12GB/256GB", priceUnit: 27990000, oldPrice: 33990000, discountPercent: 18, rating: 5, sold: 412, installment: true, badge: "Trả góp 0%", category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 202, productTitle: "Điện thoại Redmi Note 13 Pro 8GB/256GB", priceUnit: 6190000, oldPrice: 7490000, discountPercent: 17, rating: 5, sold: 980, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 203, productTitle: "Laptop Gaming RTX 4060 i7/16GB/1TB", priceUnit: 28990000, oldPrice: 32990000, discountPercent: 12, rating: 5, sold: 134, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 204, productTitle: "Tai nghe chụp tai gaming RGB 7.1", priceUnit: 890000, oldPrice: 1290000, discountPercent: 31, rating: 4, sold: 760, installment: false, category: { categoryId: 4, categoryTitle: "Âm thanh" } },
-  { productId: 205, productTitle: "Điện thoại OPPO Reno11 F 5G 8GB/256GB", priceUnit: 8290000, oldPrice: 9990000, discountPercent: 17, rating: 5, sold: 256, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 206, productTitle: "Bàn phím cơ không dây hot-swap", priceUnit: 1190000, oldPrice: 1690000, discountPercent: 30, rating: 5, sold: 420, installment: false, category: { categoryId: 9, categoryTitle: "Phụ kiện" } },
-  { productId: 207, productTitle: "Màn hình 27 inch 2K 165Hz IPS", priceUnit: 4990000, oldPrice: 6490000, discountPercent: 23, rating: 5, sold: 188, installment: true, category: { categoryId: 8, categoryTitle: "Màn hình" } },
-  { productId: 208, productTitle: "Robot hút bụi lau nhà thông minh", priceUnit: 6990000, oldPrice: 9990000, discountPercent: 30, rating: 4, sold: 145, installment: true, category: { categoryId: 7, categoryTitle: "Gia dụng" } },
-  { productId: 209, productTitle: "Củ sạc nhanh GaN 65W 3 cổng", priceUnit: 490000, oldPrice: 790000, discountPercent: 38, rating: 5, sold: 1120, installment: false, category: { categoryId: 9, categoryTitle: "Phụ kiện" } },
-  { productId: 210, productTitle: "Tivi 4K 55 inch Google TV", priceUnit: 9990000, oldPrice: 13990000, discountPercent: 28, rating: 5, sold: 99, installment: true, category: { categoryId: 10, categoryTitle: "Tivi" } },
+  { productId: 201, productTitle: "Galaxy S24 Ultra 5G AI Phone 12GB/256GB", imageUrl: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&auto=format&fit=crop&q=80", priceUnit: 1199, oldPrice: 1399, discountPercent: 14, rating: 5, sold: 412, installment: true, badge: "0% APR", category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 202, productTitle: "Redmi Note 13 Pro 8GB/256GB Smartphone", imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80", priceUnit: 269, oldPrice: 319, discountPercent: 16, rating: 5, sold: 980, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 203, productTitle: "Gaming Laptop RTX 4060 i7/16GB/1TB SSD", imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80", priceUnit: 1249, oldPrice: 1499, discountPercent: 17, rating: 5, sold: 134, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 204, productTitle: "RGB 7.1 Surround Sound Gaming Headset", imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80", priceUnit: 49, oldPrice: 69, discountPercent: 29, rating: 4, sold: 760, installment: false, category: { categoryId: 4, categoryTitle: "Audio" } },
+  { productId: 205, productTitle: "OPPO Reno11 F 5G Smartphone 8GB/256GB", imageUrl: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80", priceUnit: 349, oldPrice: 419, discountPercent: 17, rating: 5, sold: 256, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 206, productTitle: "Wireless Mechanical Keyboard Hot-Swappable", imageUrl: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80", priceUnit: 59, oldPrice: 89, discountPercent: 34, rating: 5, sold: 420, installment: false, category: { categoryId: 9, categoryTitle: "Accessories" } },
+  { productId: 207, productTitle: "27-inch 2K 165Hz IPS Gaming Monitor", imageUrl: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&auto=format&fit=crop&q=80", priceUnit: 219, oldPrice: 289, discountPercent: 24, rating: 5, sold: 188, installment: true, category: { categoryId: 8, categoryTitle: "Monitors" } },
+  { productId: 208, productTitle: "Smart Robot Vacuum & Mop with LiDAR Mapping", imageUrl: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&auto=format&fit=crop&q=80", priceUnit: 299, oldPrice: 429, discountPercent: 30, rating: 4, sold: 145, installment: true, category: { categoryId: 7, categoryTitle: "Smart Home" } },
+  { productId: 209, productTitle: "65W GaN Fast Wall Charger 3-Port Type-C", imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80", priceUnit: 22, oldPrice: 35, discountPercent: 37, rating: 5, sold: 1120, installment: false, category: { categoryId: 9, categoryTitle: "Accessories" } },
+  { productId: 210, productTitle: "55-inch 4K Ultra HD Smart Google TV HDR", imageUrl: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80", priceUnit: 429, oldPrice: 599, discountPercent: 28, rating: 5, sold: 99, installment: true, category: { categoryId: 10, categoryTitle: "TVs" } },
 ];
 
-// Left vertical category list shown in the hero (CellphoneS signature sidebar).
+// Left vertical category list shown in the hero sidebar.
 export const heroSidebar: SidebarCategory[] = [
-  { id: 1, emoji: "📱", label: "Điện thoại, Tablet", href: "/products?categoryId=1" },
-  { id: 2, emoji: "💻", label: "Laptop", href: "/products?categoryId=2" },
-  { id: 3, emoji: "🎧", label: "Âm thanh, Mic thu âm", href: "/products?categoryId=4" },
-  { id: 4, emoji: "⌚", label: "Đồng hồ, Camera", href: "/products?categoryId=5" },
-  { id: 5, emoji: "🏠", label: "Đồ gia dụng", href: "/products?categoryId=7" },
-  { id: 6, emoji: "🔌", label: "Phụ kiện", href: "/products?categoryId=9" },
-  { id: 7, emoji: "🖥️", label: "PC, Màn hình, Máy in", href: "/products?categoryId=8" },
-  { id: 8, emoji: "📺", label: "Tivi", href: "/products?categoryId=10" },
-  { id: 9, emoji: "🎮", label: "Tản nhiệt, Gaming Gear", href: "/products?categoryId=9" },
-  { id: 10, emoji: "♻️", label: "Hàng cũ giá rẻ", href: "/products" },
+  { id: 1, emoji: "📱", label: "Smartphones & Tablets", href: "/products?categoryId=1" },
+  { id: 2, emoji: "💻", label: "Laptops & Computers", href: "/products?categoryId=2" },
+  { id: 3, emoji: "🎧", label: "Audio & Microphones", href: "/products?categoryId=4" },
+  { id: 4, emoji: "⌚", label: "Smartwatches & Wearables", href: "/products?categoryId=5" },
+  { id: 5, emoji: "🏠", label: "Smart Home & Appliances", href: "/products?categoryId=7" },
+  { id: 6, emoji: "🔌", label: "Accessories & Chargers", href: "/products?categoryId=9" },
+  { id: 7, emoji: "🖥️", label: "PC, Monitors & Printers", href: "/products?categoryId=8" },
+  { id: 8, emoji: "📺", label: "TV & Smart Displays", href: "/products?categoryId=10" },
+  { id: 9, emoji: "🎮", label: "Gaming Gear & Cooling", href: "/products?categoryId=9" },
+  { id: 10, emoji: "♻️", label: "Refurbished & Deals", href: "/products" },
 ];
 
 // Brand filter chips per category section.
@@ -157,22 +152,21 @@ export const laptopBrands: BrandChip[] = [
 ];
 
 export const phoneProducts: ShowcaseProduct[] = [
-  { productId: 301, productTitle: "Điện thoại Galaxy A57 5G 8GB/256GB", priceUnit: 8490000, oldPrice: 9990000, discountPercent: 15, rating: 5, sold: 320, memberExtra: 300000, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 302, productTitle: "Điện thoại Galaxy S24 8GB/256GB", priceUnit: 19990000, oldPrice: 22990000, discountPercent: 13, rating: 5, sold: 210, memberExtra: 500000, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 303, productTitle: "Điện thoại OPPO Reno13 F 5G", priceUnit: 8990000, oldPrice: 10490000, discountPercent: 14, rating: 4, sold: 156, memberExtra: 200000, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 304, productTitle: "Điện thoại Xiaomi Redmi Note 14", priceUnit: 5290000, oldPrice: 6290000, discountPercent: 16, rating: 5, sold: 540, memberExtra: 150000, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
-  { productId: 305, productTitle: "Điện thoại realme C75 6GB/128GB", priceUnit: 4490000, oldPrice: 5290000, discountPercent: 15, rating: 4, sold: 280, installment: true, category: { categoryId: 1, categoryTitle: "Điện thoại" } },
+  { productId: 301, productTitle: "Galaxy A57 5G 8GB/256GB Smartphone", imageUrl: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&auto=format&fit=crop&q=80", priceUnit: 369, oldPrice: 429, discountPercent: 14, rating: 5, sold: 320, memberExtra: 15, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 302, productTitle: "Galaxy S24 Flagship 8GB/256GB", imageUrl: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&auto=format&fit=crop&q=80", priceUnit: 799, oldPrice: 899, discountPercent: 11, rating: 5, sold: 210, memberExtra: 25, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 303, productTitle: "OPPO Reno13 F 5G Ultra Slim", imageUrl: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80", priceUnit: 389, oldPrice: 449, discountPercent: 13, rating: 4, sold: 156, memberExtra: 10, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 304, productTitle: "Xiaomi Redmi Note 14 5G 8GB/256GB", imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80", priceUnit: 229, oldPrice: 269, discountPercent: 15, rating: 5, sold: 540, memberExtra: 10, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
+  { productId: 305, productTitle: "realme C75 6GB/128GB Long-Battery Phone", imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80", priceUnit: 189, oldPrice: 229, discountPercent: 17, rating: 4, sold: 280, installment: true, category: { categoryId: 1, categoryTitle: "Phones" } },
 ];
 
 export const laptopProducts: ShowcaseProduct[] = [
-  { productId: 401, productTitle: "Laptop MacBook Air M3 13 inch 16GB/256GB", priceUnit: 24990000, oldPrice: 27990000, discountPercent: 11, rating: 5, sold: 132, memberExtra: 500000, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 402, productTitle: "Laptop ASUS Vivobook 15 i5/16GB/512GB", priceUnit: 14990000, oldPrice: 17990000, discountPercent: 17, rating: 5, sold: 240, memberExtra: 300000, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 403, productTitle: "Laptop Gaming Lenovo LOQ RTX 4060", priceUnit: 25990000, oldPrice: 29990000, discountPercent: 13, rating: 5, sold: 98, memberExtra: 700000, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 404, productTitle: "Laptop Acer Aspire 5 i5/8GB/512GB", priceUnit: 12490000, oldPrice: 14990000, discountPercent: 16, rating: 4, sold: 310, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
-  { productId: 405, productTitle: "Laptop HP Pavilion 14 i7/16GB/1TB", priceUnit: 18990000, oldPrice: 21990000, discountPercent: 13, rating: 5, sold: 76, memberExtra: 400000, installment: true, category: { categoryId: 2, categoryTitle: "Laptop" } },
+  { productId: 401, productTitle: "MacBook Air M3 13-inch 16GB/256GB", imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80", priceUnit: 1099, oldPrice: 1199, discountPercent: 8, rating: 5, sold: 132, memberExtra: 30, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 402, productTitle: "ASUS Vivobook 15 FHD i5/16GB/512GB", imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80", priceUnit: 649, oldPrice: 779, discountPercent: 17, rating: 5, sold: 240, memberExtra: 20, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 403, productTitle: "Lenovo LOQ Gaming Laptop RTX 4060 i7/16GB", imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80", priceUnit: 1129, oldPrice: 1299, discountPercent: 13, rating: 5, sold: 98, memberExtra: 35, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 404, productTitle: "Acer Aspire 5 Slim i5/8GB/512GB SSD", imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80", priceUnit: 549, oldPrice: 649, discountPercent: 15, rating: 4, sold: 310, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
+  { productId: 405, productTitle: "HP Pavilion 14 Touchscreen i7/16GB/1TB", imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80", priceUnit: 829, oldPrice: 949, discountPercent: 13, rating: 5, sold: 76, memberExtra: 25, installment: true, category: { categoryId: 2, categoryTitle: "Laptops" } },
 ];
 
-// "Flash sale" resets at the top of the next hour.
 export function nextFlashSaleDeadline(): number {
   const now = new Date();
   const next = new Date(now);

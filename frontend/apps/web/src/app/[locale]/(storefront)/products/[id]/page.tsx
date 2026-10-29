@@ -10,7 +10,7 @@ import {
 import { useProduct } from "@/hooks";
 import { useCartStore } from "@ecommerce/lib/store";
 import { Button, Badge, QuantitySelector } from "@ecommerce/ui";
-import { formatPrice } from "@ecommerce/lib/utils";
+import { formatPrice, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import { Link, useRouter } from "@/i18n/navigation";
 import { productDetailStyles as s } from "./productDetail.styles";
 
@@ -115,22 +115,22 @@ function Breadcrumb({ product }: { product: { productTitle: string; category?: {
   );
 }
 
-function ProductGallery({ product }: { product: { imageUrl?: string; productTitle: string } }) {
+function ProductGallery({ product }: { product: { imageUrl?: string; productTitle: string; category?: { categoryTitle: string } } }) {
+  const imageUrl = resolveProductImageUrl(product.imageUrl, product.productTitle, product.category?.categoryTitle);
   return (
     <div className={s.gallery}>
-      {product.imageUrl ? (
-        <Image
-          src={product.imageUrl}
-          alt={product.productTitle}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
-      ) : (
-        <div className={s.galleryPlaceholder}>
-          <ShoppingCart className="h-24 w-24 text-primary-200" />
-        </div>
-      )}
+      <Image
+        src={imageUrl}
+        alt={product.productTitle}
+        fill
+        priority
+        unoptimized
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 50vw"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+        }}
+      />
     </div>
   );
 }

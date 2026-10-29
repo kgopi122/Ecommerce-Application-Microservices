@@ -83,6 +83,10 @@ public class UserController {
         if (jwt == null) {
             throw BusinessException.of(ErrorCode.AUTH_TOKEN_INVALID);
         }
-        return ApiResponse.ok(userMapper.toResponse(userService.findByUsername(jwt.getSubject())));
+        String username = jwt.getClaimAsString("preferred_username");
+        if (username == null || username.isBlank()) {
+            username = jwt.getSubject();
+        }
+        return ApiResponse.ok(userMapper.toResponse(userService.findByUsername(username)));
     }
 }

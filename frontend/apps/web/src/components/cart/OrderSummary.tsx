@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
-import { formatPrice } from "@ecommerce/lib/utils";
+import { formatPrice, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import { Badge } from "@ecommerce/ui";
 import type { CartItem } from "@ecommerce/lib/types";
 import { cartStyles as s } from "./cart.styles";
@@ -34,13 +34,16 @@ export default function OrderSummary({
           {items.map(({ product, quantity }) => (
             <div key={product.productId} className={s.miniRow}>
               <div className={s.miniThumb}>
-                {product.imageUrl ? (
-                  <Image src={product.imageUrl} alt={product.productTitle} fill className="object-cover" />
-                ) : (
-                  <div className={s.miniThumbPlaceholder}>
-                    <ShoppingBag className="h-6 w-6 text-gray-300" />
-                  </div>
-                )}
+                <Image
+                  src={resolveProductImageUrl(product.imageUrl, product.productTitle, product.category?.categoryTitle)}
+                  alt={product.productTitle}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+                  }}
+                />
                 <Badge className={s.miniBadge}>
                   {quantity}
                 </Badge>

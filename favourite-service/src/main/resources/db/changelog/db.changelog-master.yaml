@@ -6,3 +6,5 @@ databaseChangeLog:
       changes:
         - sql:
             sql: SELECT 1;
+  - includeAll:
+      path: db/changelog/ddl

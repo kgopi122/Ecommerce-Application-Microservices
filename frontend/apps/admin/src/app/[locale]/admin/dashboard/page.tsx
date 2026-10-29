@@ -1,16 +1,17 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
+
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { ShoppingBag, Package, Users, TrendingUp, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
 import { orderApi, productApi } from "@ecommerce/lib/api";
-import { formatPrice } from "@ecommerce/lib/utils";
+import { formatPrice, extractList } from "@ecommerce/lib/utils";
 import type { ApiResponse, PaginatedResponse, Order, Product } from "@ecommerce/lib/types";
 import { dashboardStyles as s } from "./dashboard.styles";
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
-  const tSidebar = useTranslations("Sidebar");
 
   const { data: ordersData } = useQuery({
     queryKey: ["admin-orders"],
@@ -28,10 +29,10 @@ export default function DashboardPage() {
     },
   });
 
-  const orders = ordersData?.data?.content ?? [];
-  const products = productsData?.data?.content ?? [];
-  const totalOrders = ordersData?.data?.totalElements ?? 0;
-  const totalProducts = productsData?.data?.totalElements ?? 0;
+  const orders = extractList<Order>(ordersData);
+  const products = extractList<Product>(productsData);
+  const totalOrders = Array.isArray(ordersData) ? ordersData.length : (ordersData?.data?.totalElements ?? orders.length);
+  const totalProducts = Array.isArray(productsData) ? productsData.length : (productsData?.data?.totalElements ?? products.length);
   const revenue = orders.reduce((sum, o) => sum + (o.orderFee ?? 0), 0);
 
   const stats = [
@@ -51,8 +52,8 @@ export default function DashboardPage() {
       <StatsGrid stats={stats} />
 
       <div className={s.panelsGrid}>
-        <RecentOrdersPanel orders={orders} t={t} tSidebar={tSidebar} />
-        <RecentProductsPanel products={products} t={t} tSidebar={tSidebar} />
+        <RecentOrdersPanel orders={orders} />
+        <RecentProductsPanel products={products} />
       </div>
     </div>
   );
@@ -80,12 +81,14 @@ function StatsGrid({ stats }: { stats: Array<{ label: string; value: string; ico
   );
 }
 
-function RecentOrdersPanel({ orders, t, tSidebar }: { orders: Order[]; t: any; tSidebar: any }) {
+function RecentOrdersPanel({ orders }: { orders: Order[] }) {
+  const t = useTranslations("Dashboard");
+  const tSidebar = useTranslations("Sidebar");
   return (
     <div className={s.panel}>
       <div className={s.panelHead}>
         <h2 className={s.panelTitle}>{t("recentOrders")}</h2>
-        <a href="/admin/orders" className={s.panelLink}>{tSidebar("orders")} &rarr;</a>
+        <Link href="/admin/orders" className={s.panelLink}>{tSidebar("orders")} &rarr;</Link>
       </div>
       {orders.length === 0 ? (
         <div className={s.panelEmpty}>{t("noOrders")}</div>
@@ -112,12 +115,14 @@ function RecentOrdersPanel({ orders, t, tSidebar }: { orders: Order[]; t: any; t
   );
 }
 
-function RecentProductsPanel({ products, t, tSidebar }: { products: Product[]; t: any; tSidebar: any }) {
+function RecentProductsPanel({ products }: { products: Product[] }) {
+  const t = useTranslations("Dashboard");
+  const tSidebar = useTranslations("Sidebar");
   return (
     <div className={s.panel}>
       <div className={s.panelHead}>
         <h2 className={s.panelTitle}>{t("recentProducts")}</h2>
-        <a href="/admin/products" className={s.panelLink}>{tSidebar("products")} &rarr;</a>
+        <Link href="/admin/products" className={s.panelLink}>{tSidebar("products")} &rarr;</Link>
       </div>
       {products.length === 0 ? (
         <div className={s.panelEmpty}>{t("noProducts")}</div>

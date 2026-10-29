@@ -34,7 +34,8 @@ public class PromotionPostVm extends PromotionDto {
     @NotBlank
     private String couponCode;
     Long minimumOrderPurchaseAmount;
-    boolean isActive;
+    @com.fasterxml.jackson.annotation.JsonProperty("isActive")
+    private Boolean isActive;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date startDate;

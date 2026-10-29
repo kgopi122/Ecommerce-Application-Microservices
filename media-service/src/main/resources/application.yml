@@ -44,6 +44,8 @@ ecommerce:
     path-style-access: true
     auto-create-bucket: true
     presign-duration: 1h
+hoangtien2k3:
+  publicUrl: ${HOANGTIEN2K3_PUBLICURL:${MEDIA_PUBLIC_URL:http://localhost:8083/media}}
 ---
 management:
   server:

@@ -6,7 +6,8 @@ import { ShoppingBag, Package, Clock, ArrowRight } from "lucide-react";
 import { useOrders } from "@/hooks";
 import { useAuthStore } from "@ecommerce/lib/store";
 import { Badge, Button, EmptyState, LoadingSkeleton } from "@ecommerce/ui";
-import { formatPrice, formatDate } from "@ecommerce/lib/utils";
+import { formatPrice, formatDate, extractList } from "@ecommerce/lib/utils";
+import type { Order } from "@ecommerce/lib/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { ordersStyles as s } from "./orders.styles";
 
@@ -20,7 +21,7 @@ export default function OrdersPage() {
   }, [isAuthenticated, router]);
 
   const { data, isLoading } = useOrders();
-  const orders = data?.data?.content ?? [];
+  const orders = extractList<Order>(data);
 
   return (
     <div className={s.page}>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Zap } from "lucide-react";
-import { cn, formatPrice } from "@ecommerce/lib/utils";
+import { cn, formatPrice, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import { Link } from "@/i18n/navigation";
 import { flashSaleProducts, nextFlashSaleDeadline, type ShowcaseProduct } from "@/data/homeMock";
 import { homeStyles as s } from "./home.styles";
@@ -17,10 +17,17 @@ function FlashTile({ product }: { product: ShowcaseProduct }) {
   const ratio = Math.min(100, Math.round((sold / stockTotal) * 100));
 
   return (
-    <Link href={`/products/${productId}`} className="w-40 sm:w-44 shrink-0">
+    <Link href={`/products/${productId}`} className="w-40 sm:w-44 shrink-0 group">
       <div className="bg-white rounded-xl p-2.5 h-full flex flex-col">
         <div className="relative aspect-square rounded-lg overflow-hidden mb-2 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-          <span className="text-5xl opacity-30">📦</span>
+          <img
+            src={resolveProductImageUrl(product.imageUrl, productTitle, product.category?.categoryTitle)}
+            alt={productTitle}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+            }}
+          />
           {!!discountPercent && (
             <span className="absolute top-0 left-0 bg-amber-400 text-amber-900 text-[11px] font-bold px-1.5 py-0.5 rounded-br-lg">
               -{discountPercent}%
@@ -34,7 +41,7 @@ function FlashTile({ product }: { product: ShowcaseProduct }) {
           <div className="relative h-4 rounded-full bg-amber-100 overflow-hidden">
             <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-400 to-primary-500" style={{ width: `${ratio}%` }} />
             <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-primary-700">
-              Đã bán {sold}
+              Sold {sold}
             </span>
           </div>
         </div>

@@ -1,7 +1,10 @@
 package com.ecommerce.promotion.exception;
 
 import com.ecommerce.promotion.utils.MessagesUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+@ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicatedException extends RuntimeException {
 
     private String message;

@@ -83,18 +83,27 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentDto paymentDto = paymentRepository.findById(paymentId)
                 .map(PaymentMappingHelper::map)
                 .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id: %d not found", paymentId)));
+        String token = JwtTokenFilter.getTokenFromRequest();
         try {
-            String token = JwtTokenFilter.getTokenFromRequest();
-            OrderDto orderDto = callAPI.receiverPaymentDto(paymentDto.getOrderDto().getOrderId(), token);
-            if (orderDto != null) {
-                paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
-            }
-            UserDto userDto = callAPI.receiverUserDto(paymentDto.getUserId(), token);
-            if (userDto != null) {
-                paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
+            Integer orderId = paymentDto.getOrderId() != null ? paymentDto.getOrderId() : (paymentDto.getOrderDto() != null ? paymentDto.getOrderDto().getOrderId() : null);
+            if (orderId != null) {
+                OrderDto orderDto = callAPI.receiverPaymentDto(orderId, token);
+                if (orderDto != null) {
+                    paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
+                }
             }
         } catch (Exception e) {
-            log.error("Error fetching order or user info: {}", e.getMessage());
+            log.warn("Could not enrich order for payment {}: {}", paymentId, e.getMessage());
+        }
+        try {
+            if (paymentDto.getUserId() != null) {
+                UserDto userDto = callAPI.receiverUserDto(paymentDto.getUserId(), token);
+                if (userDto != null) {
+                    paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not enrich user for payment {}: {}", paymentId, e.getMessage());
         }
         return paymentDto;
     }

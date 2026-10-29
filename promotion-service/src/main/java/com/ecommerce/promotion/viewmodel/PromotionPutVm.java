@@ -34,7 +34,8 @@ public class PromotionPutVm extends PromotionDto {
     @NotBlank
     private String couponCode;
     private Long minimumOrderPurchaseAmount;
-    private boolean isActive;
+    @com.fasterxml.jackson.annotation.JsonProperty("isActive")
+    private Boolean isActive;
     @NotNull
     private Date startDate;
     @NotNull

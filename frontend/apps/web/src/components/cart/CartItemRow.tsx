@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
-import { formatPrice } from "@ecommerce/lib/utils";
+import { Trash2, ShoppingBag } from "lucide-react";
+import { formatPrice, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import { QuantitySelector } from "@ecommerce/ui";
 import type { CartItem } from "@ecommerce/lib/types";
 import { Link } from "@/i18n/navigation";
@@ -21,13 +21,16 @@ export default function CartItemRow({ item, onUpdateQuantity, onRemove }: CartIt
     <div className={s.row}>
       <Link href={`/products/${product.productId}`} className="flex-shrink-0">
         <div className={s.thumbWrap}>
-          {product.imageUrl ? (
-            <Image src={product.imageUrl} alt={product.productTitle} fill className="object-cover" />
-          ) : (
-            <div className={s.thumbPlaceholder}>
-              <ShoppingBag className="h-8 w-8 text-gray-300" />
-            </div>
-          )}
+          <Image
+            src={resolveProductImageUrl(product.imageUrl, product.productTitle, product.category?.categoryTitle)}
+            alt={product.productTitle}
+            fill
+            unoptimized
+            className="object-cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+            }}
+          />
         </div>
       </Link>
 

@@ -11,12 +11,20 @@ function resolveApiBaseUrl(): string {
   if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL as string;
   if (typeof window !== "undefined") {
     const { protocol, hostname, port } = window.location;
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname.endsWith(".localhost")
+    ) {
+      return "http://localhost:9080";
+    }
     const parts = hostname.split(".");
     const rootDomain = parts.length > 2 ? parts.slice(1).join(".") : hostname;
     const apiHost = `api.${rootDomain}`;
     return `${protocol}//${apiHost}${port ? `:${port}` : ""}`;
   }
-  return "";
+  return "http://localhost:9080";
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();
@@ -40,11 +48,22 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    if (!originalRequest) return Promise.reject(error);
+
+    // If refresh itself failed with 401, don't loop
+    if (originalRequest.url?.includes("/api/v1/auth/refresh")) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem("refresh_token");
+        const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
         if (refreshToken) {
           const { data } = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, {
             refreshToken,
@@ -57,9 +76,21 @@ apiClient.interceptors.response.use(
           }
         }
       } catch {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/login";
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+
+          // Only redirect if current route is protected; never redirect from public pages or /login
+          const path = window.location.pathname;
+          const isAuthPage = path.includes("/login") || path.includes("/register") || path.includes("/auth/callback");
+          const isProtected = path.includes("/profile") || path.includes("/checkout") || path.includes("/orders") || path.includes("/admin");
+          const isOptionalProfile = originalRequest.url?.includes("/api/v1/users/me");
+
+          if (!isAuthPage && isProtected && !isOptionalProfile) {
+            const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/login?redirect=${redirectUrl}`;
+          }
+        }
       }
     }
     return Promise.reject(error);
@@ -67,6 +98,17 @@ apiClient.interceptors.response.use(
 );
 
 // Token bundle returned by the backend SSO `/session` exchange (Keycloak shape).
+export interface RegisterPayload {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  gender: string;
+  phone?: string;
+  avatar?: string;
+  roles?: string[];
+}
+
 export interface SsoTokenResponse {
   access_token: string;
   refresh_token: string;
@@ -89,6 +131,9 @@ export function buildSsoLoginUrl(callbackPath = "/auth/callback"): string {
 
 // Auth API
 export const authApi = {
+  // Direct self-service signup
+  signup: (payload: RegisterPayload) =>
+    apiClient.post<{ success: boolean; message: string }>("/api/v1/auth/signup", payload),
   // SSO: exchange the single-use ticket from the callback redirect for real tokens.
   getSession: (ticket: string) =>
     apiClient.get<{ data: SsoTokenResponse }>("/api/v1/auth/session", { params: { ticket } }),
@@ -159,7 +204,11 @@ export const favouriteApi = {
 // Rating API
 export const ratingApi = {
   getByProduct: (productId: number) =>
-    apiClient.get(`/storefront/ratings`, { params: { productId } }),
+    apiClient.get(`/storefront/ratings/products/${productId}`),
+  getAverageStar: (productId: number) =>
+    apiClient.get(`/storefront/ratings/product/${productId}/average-star`),
+  getBackofficeRatings: (params?: { pageNo?: number; pageSize?: number }) =>
+    apiClient.get("/backoffice/ratings", { params }),
   create: (data: unknown) => apiClient.post("/storefront/ratings", data),
 };
 
@@ -176,3 +225,62 @@ export const searchApi = {
   suggest: (keyword: string) =>
     apiClient.get("/storefront/search_suggest", { params: { keyword } }),
 };
+
+// User API
+
+export const userApi = {
+
+  getAll: (params?: { page?: number; size?: number; sortBy?: string; sortOrder?: string }) =>
+
+    apiClient.get("/api/v1/users/all", { params }),
+
+  getById: (id: number) => apiClient.get(`/api/v1/users/${id}`),
+
+};
+
+
+
+// Shipping API
+
+export const shippingApi = {
+
+  getAll: () => apiClient.get("/api/shippings"),
+
+  getById: (orderId: number, productId: number) =>
+
+    apiClient.get(`/api/shippings/${orderId}/${productId}`),
+
+  create: (data: unknown) => apiClient.post("/api/shippings", data),
+
+};
+
+
+
+// Tax API
+
+export const taxApi = {
+
+  getTaxClasses: () => apiClient.get("/backoffice/tax-classes"),
+
+};
+
+
+
+// Promotion API
+
+export const promotionApi = {
+
+  getPromotions: () => apiClient.get("/backoffice/promotions"),
+
+};
+
+
+
+// Notification API
+
+export const notificationApi = {
+
+  getAll: () => apiClient.get("/api/notifications"),
+
+};
+

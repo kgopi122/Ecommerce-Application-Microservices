@@ -6,3 +6,7 @@ databaseChangeLog:
       changes:
         - sql:
             sql: SELECT 1;
+  - includeAll:
+      path: ddl
+      relativeToChangelogFile: true
+

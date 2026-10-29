@@ -3,10 +3,12 @@ package com.ecommerce.shippingservice.domain;
 import com.ecommerce.shippingservice.domain.id.OrderItemId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,6 +16,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "order_items")
 @IdClass(OrderItemId.class)
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

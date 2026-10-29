@@ -99,12 +99,23 @@ public class KeycloakAuthClient {
         MultiValueMap<String, String> form = baseClientForm();
         form.add(REFRESH_TOKEN, Objects.requireNonNull(refreshToken, "refreshToken"));
 
-        execute(() -> restClient.post()
-                .uri(properties.logoutEndpoint())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
-                .retrieve()
-                .toBodilessEntity());
+        execute(() -> {
+            var req = restClient.post()
+                    .uri(properties.logoutEndpoint())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(form);
+            String publicUrl = properties.publicServerUrlOrDefault();
+            if (StringUtils.hasText(publicUrl)) {
+                try {
+                    URI publicUri = URI.create(publicUrl);
+                    if (publicUri.getAuthority() != null) {
+                        req.header(HttpHeaders.HOST, publicUri.getAuthority());
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            return req.retrieve().toBodilessEntity();
+        });
     }
 
     // ------------------------------------------------------------------
@@ -157,12 +168,23 @@ public class KeycloakAuthClient {
     // ------------------------------------------------------------------
 
     private KeycloakTokenResponse postToken(MultiValueMap<String, String> form) {
-        return execute(() -> restClient.post()
-                .uri(properties.tokenEndpoint())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
-                .retrieve()
-                .body(KeycloakTokenResponse.class));
+        return execute(() -> {
+            var req = restClient.post()
+                    .uri(properties.tokenEndpoint())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(form);
+            String publicUrl = properties.publicServerUrlOrDefault();
+            if (StringUtils.hasText(publicUrl)) {
+                try {
+                    URI publicUri = URI.create(publicUrl);
+                    if (publicUri.getAuthority() != null) {
+                        req.header(HttpHeaders.HOST, publicUri.getAuthority());
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            return req.retrieve().body(KeycloakTokenResponse.class);
+        });
     }
 
     private MultiValueMap<String, String> baseClientForm() {

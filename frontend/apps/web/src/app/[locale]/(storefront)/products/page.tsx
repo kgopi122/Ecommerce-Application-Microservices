@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { SlidersHorizontal } from "lucide-react";
 import { useProducts, useCategories } from "@/hooks";
 import { Button, Pagination, EmptyState } from "@ecommerce/ui";
-import { cn } from "@ecommerce/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 import { SortSelect } from "@/components/ui/SortSelect";
 import { FilterSidebar, FilterGroup, FilterButton } from "@/components/ui/FilterSidebar";
@@ -29,7 +28,6 @@ const PRICE_RANGES = [
 
 function ProductsContent() {
   const t = useTranslations("Products");
-  const tCommon = useTranslations("Common");
   const searchParams = useSearchParams();
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState("productId,desc");
@@ -44,11 +42,17 @@ function ProductsContent() {
   const { data: categoriesData } = useCategories();
   const { data: productsData, isLoading } = useProducts({ page, sort, categoryId: selectedCategory, search });
 
-  const categories = categoriesData?.data?.content ?? [];
+  const categories = Array.isArray(categoriesData?.data) ? categoriesData.data : (categoriesData?.data?.content ?? (Array.isArray(categoriesData) ? categoriesData : []));
   const products = productsData ?? [];
   const totalPages = productsData?.length ? Math.ceil(productsData.length / 12) : 0;
 
-  useEffect(() => { setPage(0); }, [selectedCategory, sort, search]);
+  // Reset page when category, sort, or search changes without triggering cascading renders in effect
+  const [filterKey, setFilterKey] = useState(() => `${selectedCategory}-${sort}-${search}`);
+  const currentKey = `${selectedCategory}-${sort}-${search}`;
+  if (filterKey !== currentKey) {
+    setFilterKey(currentKey);
+    setPage(0);
+  }
 
   return (
     <div className={s.page}>

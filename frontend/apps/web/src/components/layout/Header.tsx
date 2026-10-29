@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
+
+const emptySubscribe = () => () => {};
 import { useTranslations } from "next-intl";
 import {
   ShoppingCart, Search, User, Menu, X, Heart,
@@ -24,10 +26,9 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const profileRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { setCartCount(totalItems()); }, [totalItems]);
+  const cartCount = mounted ? totalItems() : 0;
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -187,7 +188,7 @@ function ProfileDropdown({
 function MobileMenu({
   onSearch, onClose, isAuthenticated,
 }: {
-  onSearch: (q: string) => void;
+  onSearch?: (q: string) => void;
   onClose: () => void;
   isAuthenticated: boolean;
 }) {
@@ -199,7 +200,10 @@ function MobileMenu({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (q.trim()) window.location.href = `/products?search=${encodeURIComponent(q.trim())}`;
+          if (q.trim()) {
+            onSearch?.(q.trim());
+            window.location.href = `/products?search=${encodeURIComponent(q.trim())}`;
+          }
         }}
         className="flex border border-gray-300 rounded-lg overflow-hidden"
       >

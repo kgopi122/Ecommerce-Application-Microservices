@@ -1,0 +1,254 @@
+[
+  {
+    "id": "AUTH-01",
+    "name": "Keycloak Direct Login (USER: testuser)",
+    "status": "PASS",
+    "details": "Acquired JWT, expires_in=300s"
+  },
+  {
+    "id": "AUTH-02",
+    "name": "Keycloak Direct Login (ADMIN: adminuser)",
+    "status": "PASS",
+    "details": "Acquired JWT, expires_in=300s"
+  },
+  {
+    "id": "AUTH-03",
+    "name": "Keycloak Invalid Credentials Rejection",
+    "status": "PASS",
+    "details": "HTTP 401/error returned for wrong password"
+  },
+  {
+    "id": "AUTH-04",
+    "name": "Keycloak Non-Existent User Rejection",
+    "status": "PASS",
+    "details": "HTTP 401/error returned for missing user"
+  },
+  {
+    "id": "AUTH-05",
+    "name": "Keycloak JWKS Public Certs Endpoint",
+    "status": "PASS",
+    "details": "Found 2 keys in JWKS"
+  },
+  {
+    "id": "AUTH-06",
+    "name": "Keycloak OIDC Discovery Endpoint",
+    "status": "PASS",
+    "details": "issuer=http://localhost:8080/realms/ecommerce, token_endpoint=http://localhost:8080/realms/ecommerce/protocol/openid-connect/token"
+  },
+  {
+    "id": "AUTH-07",
+    "name": "Auth-Service Actuator Health & DB Check",
+    "status": "PASS",
+    "details": "Actuator reports status UP with PostgreSQL connection valid"
+  },
+  {
+    "id": "AUTH-08",
+    "name": "SSO Step 1: /api/v1/auth/login Redirect",
+    "status": "PASS",
+    "details": "302 to Keycloak with client_id, state, redirect_uri=http://localhost:8080/realms/ecommerce/protocol/openid-connect/auth?client_id=ec..."
+  },
+  {
+    "id": "AUTH-09",
+    "name": "SSO Anti Open-Redirect Protection",
+    "status": "PASS",
+    "details": "Disallowed redirect_uri falls back to defaultFrontendRedirect"
+  },
+  {
+    "id": "AUTH-10",
+    "name": "SSO Callback Error Handling",
+    "status": "PASS",
+    "details": "Bounces error to frontend redirect: http://localhost:3000/auth/callback?error=access_denied"
+  },
+  {
+    "id": "AUTH-11",
+    "name": "SSO Callback Invalid State Rejection",
+    "status": "PASS",
+    "details": "HTTP 401 returned for unknown/expired state: sso.state.invalid"
+  },
+  {
+    "id": "AUTH-12",
+    "name": "SSO Session Invalid Ticket Rejection",
+    "status": "PASS",
+    "details": "HTTP 401 returned for invalid ticket: sso.ticket.invalid"
+  },
+  {
+    "id": "AUTH-13",
+    "name": "User Signup Validation Enforcement",
+    "status": "PASS",
+    "details": "HTTP 400 returned for invalid DTO constraints"
+  },
+  {
+    "id": "AUTH-14",
+    "name": "Valid User Self-Service Signup",
+    "status": "PASS",
+    "details": "Registered user 'integuser174205' in Keycloak + PostgreSQL: User integuser174205 registered successfully"
+  },
+  {
+    "id": "AUTH-15",
+    "name": "Duplicate Username Signup Rejection",
+    "status": "PASS",
+    "details": "HTTP 409 Conflict returned: T\u00ean \u0111\u0103ng nh\u1eadp integuser174205 \u0111\u00e3 t\u1ed3n t\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i."
+  },
+  {
+    "id": "AUTH-16",
+    "name": "Duplicate Email Signup Rejection",
+    "status": "PASS",
+    "details": "HTTP 409 Conflict returned: Email integ174205@local.dev \u0111\u00e3 t\u1ed3n t\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i."
+  },
+  {
+    "id": "AUTH-17",
+    "name": "Authenticate Newly Registered User via Keycloak",
+    "status": "PASS",
+    "details": "Successfully acquired JWT for newly registered 'integuser174205'"
+  },
+  {
+    "id": "AUTH-18",
+    "name": "Token Refresh Endpoint (/api/v1/auth/refresh)",
+    "status": "PASS",
+    "details": "Exchanged refresh token for fresh access token"
+  },
+  {
+    "id": "AUTH-19",
+    "name": "Invalid Refresh Token Rejection",
+    "status": "PASS",
+    "details": "HTTP 400 returned for corrupted refresh token"
+  },
+  {
+    "id": "AUTH-20",
+    "name": "Anonymous Request to Protected Endpoint",
+    "status": "PASS",
+    "details": "HTTP 401 Unauthorized returned"
+  },
+  {
+    "id": "AUTH-21",
+    "name": "Tampered JWT Rejection",
+    "status": "PASS",
+    "details": "HTTP 401 Unauthorized returned for forged JWT"
+  },
+  {
+    "id": "AUTH-22",
+    "name": "Expired / Invalid Signature Token Rejection",
+    "status": "PASS",
+    "details": "HTTP 401 returned for expired token structure"
+  },
+  {
+    "id": "AUTH-23",
+    "name": "Get Current User Profile (/api/v1/users/me)",
+    "status": "PASS",
+    "details": "Returned id=3, username=integuser174205, email=integ174205@local.dev"
+  },
+  {
+    "id": "AUTH-24",
+    "name": "RBAC: USER Access to Admin /api/v1/users/all Rejection",
+    "status": "PASS",
+    "details": "HTTP 403 Forbidden returned for USER role"
+  },
+  {
+    "id": "AUTH-25",
+    "name": "RBAC: ADMIN Access to /api/v1/users/all",
+    "status": "PASS",
+    "details": "HTTP 200 OK, totalElements=2"
+  },
+  {
+    "id": "AUTH-26",
+    "name": "Lookup User by Username (/api/v1/users?username=...)",
+    "status": "PASS",
+    "details": "Found user id=3"
+  },
+  {
+    "id": "AUTH-27",
+    "name": "Lookup User by ID (/api/v1/users/{id})",
+    "status": "PASS",
+    "details": "Found user integuser174205 with id=3"
+  },
+  {
+    "id": "AUTH-28",
+    "name": "Update User Profile (PUT /api/v1/users/{id})",
+    "status": "PASS",
+    "details": "Profile successfully updated to 'Updated Name 174205'"
+  },
+  {
+    "id": "AUTH-29",
+    "name": "Change Password Contract Check",
+    "status": "PASS",
+    "details": "HTTP 400 Bad Request returned with 'auth.password.managed.by.keycloak' message"
+  },
+  {
+    "id": "AUTH-30",
+    "name": "RBAC: USER Access to /api/v1/roles/users/{id} Rejection",
+    "status": "PASS",
+    "details": "HTTP 403 Forbidden returned for USER role"
+  },
+  {
+    "id": "AUTH-31",
+    "name": "RBAC: ADMIN Access to /api/v1/roles/users/{id}",
+    "status": "PASS",
+    "details": "Returned roles: ['USER']"
+  },
+  {
+    "id": "AUTH-32",
+    "name": "Role Assignment (POST /api/v1/roles/users/{id}/assign)",
+    "status": "PASS",
+    "details": "Assigned role 'PM' to user 3"
+  },
+  {
+    "id": "AUTH-33",
+    "name": "Verify Role Persistence in Database",
+    "status": "PASS",
+    "details": "Roles after assignment: ['USER', 'PM']"
+  },
+  {
+    "id": "AUTH-34",
+    "name": "Role Revocation (POST /api/v1/roles/users/{id}/revoke)",
+    "status": "PASS",
+    "details": "Revoked role 'PM' from user 3"
+  },
+  {
+    "id": "AUTH-35",
+    "name": "Cross-Service JWT: product-service (port 8086)",
+    "status": "PASS",
+    "details": "Keycloak JWT accepted by product-service"
+  },
+  {
+    "id": "AUTH-36",
+    "name": "Cross-Service JWT: shipping-service (port 8087)",
+    "status": "PASS",
+    "details": "Keycloak USER JWT accepted by shipping-service"
+  },
+  {
+    "id": "AUTH-37",
+    "name": "Cross-Service JWT: search-service (port 8094)",
+    "status": "PASS",
+    "details": "Keycloak JWT accepted by search-service"
+  },
+  {
+    "id": "AUTH-38",
+    "name": "Cross-Service JWT: order-service (port 8084)",
+    "status": "PASS",
+    "details": "Keycloak JWT accepted by order-service (status 200)"
+  },
+  {
+    "id": "AUTH-39",
+    "name": "Cross-Service JWT: payment-service (port 8085)",
+    "status": "PASS",
+    "details": "Keycloak JWT accepted by payment-service (status 404)"
+  },
+  {
+    "id": "AUTH-40",
+    "name": "Issuer Mismatch: Browser-Facing vs Internal URL Separation",
+    "status": "PASS",
+    "details": "Resource server strictly rejects browser-issued token (iss=localhost:8080) against internal JWT_ISSUER_URI (keycloak:8080)"
+  },
+  {
+    "id": "AUTH-41",
+    "name": "User Logout Endpoint (POST /api/v1/auth/logout)",
+    "status": "PASS",
+    "details": "Successfully revoked session in Keycloak: Logout successful"
+  },
+  {
+    "id": "AUTH-42",
+    "name": "Delete User (DELETE /api/v1/users/{id})",
+    "status": "PASS",
+    "details": "User 3 deleted successfully from database"
+  }
+]

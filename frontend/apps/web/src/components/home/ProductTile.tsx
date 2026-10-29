@@ -2,7 +2,7 @@
 
 import { Star, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { formatPrice, cn } from "@ecommerce/lib/utils";
+import { formatPrice, cn, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import { Link } from "@/i18n/navigation";
 import type { ShowcaseProduct } from "@/data/homeMock";
 import { homeStyles as s } from "./home.styles";
@@ -20,13 +20,20 @@ export default function ProductTile({ product, className }: ProductTileProps) {
   } = product;
 
   return (
-    <Link href={`/products/${productId}`} className={cn("block h-full", className)}>
+    <Link href={`/products/${productId}`} className={cn("block h-full group", className)}>
       <div className={s.tile}>
         {!!discountPercent && <span className={s.tileDiscount}>-{discountPercent}%</span>}
         <span className={s.tileFav}><Heart className="h-3.5 w-3.5 text-gray-400" /></span>
 
         <div className={s.tileImage}>
-          <span className={s.tileImageEmoji}>📦</span>
+          <img
+            src={resolveProductImageUrl(product.imageUrl, productTitle, product.category?.categoryTitle)}
+            alt={productTitle}
+            className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+            }}
+          />
         </div>
 
         <h3 className={s.tileTitle}>{productTitle}</h3>
@@ -46,7 +53,7 @@ export default function ProductTile({ product, className }: ProductTileProps) {
 
         {!!memberExtra && (
           <p className={s.tileMemberBox}>
-            Smember giảm thêm{" "}
+            Member discount{" "}
             <span className={s.tileMemberAmount}>{formatPrice(memberExtra)}</span>
           </p>
         )}

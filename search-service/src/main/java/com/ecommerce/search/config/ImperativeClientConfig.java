@@ -17,9 +17,26 @@ public class ImperativeClientConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
-        return ClientConfiguration.builder()
-                .connectedTo(elasticsearchConfig.getUrl())
-                .withBasicAuth(elasticsearchConfig.getUsername(), elasticsearchConfig.getPassword())
-                .build();
+        String rawUrl = elasticsearchConfig.getUrl();
+        if (rawUrl == null || rawUrl.isBlank()) {
+            rawUrl = "localhost:9200";
+        }
+        boolean isSsl = rawUrl.startsWith("https://");
+        String hostAndPort = rawUrl.replaceFirst("^https?://", "");
+
+        ClientConfiguration.MaybeSecureClientConfigurationBuilder builder = ClientConfiguration.builder()
+                .connectedTo(hostAndPort);
+
+        if (isSsl) {
+            builder.usingSsl();
+        }
+
+        String username = elasticsearchConfig.getUsername();
+        String password = elasticsearchConfig.getPassword();
+        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+            builder.withBasicAuth(username, password);
+        }
+
+        return builder.build();
     }
 }

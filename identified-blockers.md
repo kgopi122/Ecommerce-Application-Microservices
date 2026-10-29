@@ -6,36 +6,19 @@ This document lists all architectural, configuration, compilation, runtime, and 
 
 ## High Impact Runtime & Communication Blockers
 
-### 1. Hardcoded Incorrect Ports in `shipping-service` (`AppConstant.java`)
-* **File**: `shipping-service/src/main/java/com/ecommerce/shippingservice/constant/AppConstant.java`
-* **Issue**:
-  ```java
-  public static final String PRODUCT_SERVICE_API_URL = "http://localhost:8830/api/products";
-  public static final String ORDER_SERVICE_API_URL = "http://localhost:8300/api/orders";
-  ```
-  `product-service` runs on port **`8086`**, NOT `8830`.
-  `order-service` runs on port **`8084`**, NOT `8300`.
-* **Impact**: When `shipping-service` attempts to fetch product or order details via REST, HTTP connection errors (`ConnectException`) occur immediately.
+### 1. Hardcoded Incorrect Ports in `shipping-service` (`AppConstant.java`) — [RESOLVED in Phase 4K]
+* **File**: `shipping-service/src/main/java/com/ecommerce/shippingservice/constant/AppConstant.java`, `OrderItemServiceImpl.java`
+* **Resolution**: Updated `AppConstant.java` with correct container endpoints (`http://product-service:8086/product/api/products` and `http://order-service:8084/order/api/orders`), added dynamic environment variable lookups (`PRODUCT_SERVICE_URL`, `ORDER_SERVICE_URL`, `PRODUCT_SERVICE_API_URL`, `ORDER_SERVICE_API_URL`), fixed constructor argument order inversion (`productId` vs `orderId`), implemented `findById(orderItemId)` fix, and added outbound Bearer token propagation with failure resilience. Validated end-to-end with active `product-service` and `order-service` integration.
 
-### 2. Invalid Uppercase Hostnames in `payment-service` (`CallAPI.java`)
+### 2. Invalid Uppercase Hostnames in `payment-service` (`CallAPI.java`) — [RESOLVED in Phase 4J]
 * **File**: `payment-service/src/main/java/com/ecommerce/paymentservice/service/CallAPI.java`
-* **Issue**:
-  ```java
-  restClientBuilder.baseUrl("http://ORDER-SERVICE").build();
-  restClientBuilder.baseUrl("http://AUTH-SERVICE").build();
-  ```
-  Spring Cloud Gateway and Eureka were removed from the project in favor of Apache APISIX. There is no Ribon/Eureka client resolving uppercase hostnames `ORDER-SERVICE` or `AUTH-SERVICE`.
-* **Impact**: `payment-service` cannot resolve `http://ORDER-SERVICE` or `http://AUTH-SERVICE` in Docker/K8s DNS (`UnknownHostException`).
+* **Resolution**: Updated `CallAPI.java` to support `ORDER_SERVICE_URL` (`http://order-service:8084/order` with proper `/order` servlet context path) and `AUTH_SERVICE_URL` (`http://auth-service:8088`), and resolved the double Bearer token prefix issue. Validated end-to-end with active `order-service` 
 
-### 3. Missing `ecommerce.services` Configuration Properties
-* **Affected Services**: `rating-service`, `promotion-service`, `search-service`, `tax-service`.
+### 3. Missing `ecommerce.services` Configuration Properties — [RESOLVED for `rating-service`, `promotion-service`, `tax-service`, and `search-service`]
+* **Affected Services**: `rating-service` (Resolved in 4H), `promotion-service` (Resolved in 4I), `tax-service` (Resolved in 4E), `search-service` (Resolved in 4L).
 * **Issue**: Service classes bind `@ConfigurationProperties(prefix = "ecommerce.services")` to construct URIs with `UriComponentsBuilder.fromHttpUrl(serviceUrlConfig.product())`.
-  However, no default values or environment overrides exist in `application.yml` or `k8s/configmap.yaml` for:
-  * `ecommerce.services.product`
-  * `ecommerce.services.customer`
-  * `ecommerce.services.order`
-  * `ecommerce.services.location`
-* **Impact**: Invoking methods that use these HTTP clients results in `IllegalArgumentException: HTTP URL must not be null` or `NullPointerException`.
+  `search-service` was updated with `ECOMMERCE_SERVICES_PRODUCT: http://product-service:8086`, a custom `RestClientConfig` bean was added to provide `RestClient`, and `ImperativeClientConfig` was updated to properly sanitize Elasticsearch host/port strings.
+* **Impact**: Handled cleanly with fallback defaults, resilience, and explicit environment mappings in `docker-compose.yml`.
 
 ### 4. Missing Debezium / Kafka Connect for `search-service` CDC
 * **File**: `search-service/src/main/resources/application.yml` (`product.topic.name: dbproduct.public.product`)
@@ -46,6 +29,11 @@ This document lists all architectural, configuration, compilation, runtime, and 
 * **Affected Services**: `notification-service` (`EventConsumer.java`) listens to `profileOnboarding`.
 * **Issue**: No active producer generates events for `profileOnboarding` (the producer in `payment-service` was commented out).
 * **Impact**: Onboarding email notifications are never triggered via Kafka.
+
+### 6. Legacy Inter-Service User Lookup Path Mismatch in `order-service` and `payment-service`
+* **Files**: `order-service/.../CallAPI.java`, `payment-service/.../CallAPI.java`
+* **Issue**: `CallAPI.receiverUserDto` queries `baseUrl + "/api/manager/user/{id}"`. However, `auth-service` runs with context path `/auth` and canonical user lookup route `GET /auth/api/v1/users/{id}` (returning `ApiResponse<UserResponse>`), rather than a raw unwrapped `UserDto` at `/api/manager/user/{id}`.
+* **Impact**: `payment-service` safely catches the error via `try ... catch (Exception e) { log.warn(...); }` leaving the user field null. In `order-service`, cart enrichment attempts fail if invoked. Downstream callers should query `/auth/api/v1/users/{id}` or rely on Keycloak JWT claims (`preferred_username`, `sub`, `email`, `name`).
 
 ---
 

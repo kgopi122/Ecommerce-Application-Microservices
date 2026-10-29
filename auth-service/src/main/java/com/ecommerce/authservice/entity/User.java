@@ -47,9 +47,8 @@ public class User {
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @Pattern(regexp = "^\\+84[0-9]{9,10}$|^0[0-9]{9,10}$", message = "The phone number is not in the correct format")
-    @Size(min = 10, max = 11, message = "Phone number must be between 10 and 11 characters")
-    @Column(name = "phone_number", unique = true)
+    @Pattern(regexp = "^(\\+?[0-9]{8,15})?$", message = "The phone number is not in the correct format")
+    @Column(name = "phone_number")
     private String phone;
 
     @Pattern(regexp = "^(http|https)://.*$", message = "Avatar URL must be a valid HTTP or HTTPS URL")

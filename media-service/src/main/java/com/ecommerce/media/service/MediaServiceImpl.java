@@ -27,7 +27,7 @@ public class MediaServiceImpl implements MediaService {
     private final MediaVmMapper mediaVmMapper;
     private final MediaRepository mediaRepository;
     private final ObjectStorageService objectStorageService;
-    @Value("${hoangtien2k3.publicUrl:http://localhost:8083}")
+    @Value("${hoangtien2k3.publicUrl:http://localhost:8083/media}")
     private String publicUrl;
 
     @Override
@@ -95,13 +95,16 @@ public class MediaServiceImpl implements MediaService {
         if (media == null || !fileName.equalsIgnoreCase(media.getFileName())) {
             return builder.build();
         }
-        MediaType mediaType = MediaType.valueOf(media.getMediaType());
-        StorageObject storageObject = objectStorageService.download(media.getFilePath());
-
-        return builder
-            .content(storageObject.getContent())
-            .mediaType(mediaType)
-            .build();
+        try {
+            MediaType mediaType = MediaType.valueOf(media.getMediaType());
+            StorageObject storageObject = objectStorageService.download(media.getFilePath());
+            return builder
+                .content(storageObject.getContent())
+                .mediaType(mediaType)
+                .build();
+        } catch (Exception e) {
+            return builder.build();
+        }
     }
 
     @Override

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { ShoppingBag, Eye, Clock } from "lucide-react";
 import { useAdminOrders } from "@/hooks";
 import { Badge, DataTable } from "@ecommerce/ui";
-import { formatPrice, formatDate } from "@ecommerce/lib/utils";
+import { formatPrice, formatDate, extractList } from "@ecommerce/lib/utils";
 import type { Order } from "@ecommerce/lib/types";
 import { ordersStyles as s } from "./orders.styles";
 
@@ -16,8 +16,8 @@ export default function AdminOrdersPage() {
 
   const { data, isLoading } = useAdminOrders(page);
 
-  const orders = data?.data?.content ?? [];
-  const totalPages = data?.data?.totalPages ?? 0;
+  const orders = extractList<Order>(data);
+  const totalPages = data?.data?.totalPages ?? (orders.length > 0 ? Math.ceil(orders.length / 10) : 0);
   const filtered = orders.filter((o) => !search || String(o.orderId).includes(search));
 
   const columns = [

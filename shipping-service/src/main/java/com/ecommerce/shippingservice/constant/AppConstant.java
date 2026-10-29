@@ -18,10 +18,10 @@ public abstract class AppConstant {
         public static final String USER_SERVICE_API_URL = "http://AUTH-SERVICE/auth-service/api/users";
 
         public static final String PRODUCT_SERVICE_HOST = "http://product-service:8086";
-        public static final String PRODUCT_SERVICE_API_URL = "http://product-service:8086/api/products";
+        public static final String PRODUCT_SERVICE_API_URL = "http://product-service:8086/product/api/products";
 
         public static final String ORDER_SERVICE_HOST = "http://order-service:8084";
-        public static final String ORDER_SERVICE_API_URL = "http://order-service:8084/api/orders";
+        public static final String ORDER_SERVICE_API_URL = "http://order-service:8084/order/api/orders";
 
 //        public static final String FAVOURITE_SERVICE_HOST = "http://FAVOURITE-SERVICE/favourite-service";
 //        public static final String FAVOURITE_SERVICE_API_URL = "http://FAVOURITE-SERVICE/favourite-service/api/favourites";

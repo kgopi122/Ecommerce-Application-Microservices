@@ -32,7 +32,7 @@ public class OrderItemController {
                                                  @PathVariable("productId") final String productId) {
         log.info("OrderItemDto, resource; fetch orderItem by id");
         return ResponseEntity.ok(this.orderItemService.findById(
-                new OrderItemId(Integer.parseInt(orderId), Integer.parseInt(productId))));
+                new OrderItemId(Integer.parseInt(productId), Integer.parseInt(orderId))));
     }
 
     @GetMapping("/find")
@@ -62,7 +62,7 @@ public class OrderItemController {
     public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final String orderId,
                                               @PathVariable("productId") final String productId) {
         log.info("Boolean, resource; delete orderItem by id");
-        this.orderItemService.deleteById(new OrderItemId(Integer.parseInt(orderId), Integer.parseInt(productId)));
+        this.orderItemService.deleteById(new OrderItemId(Integer.parseInt(productId), Integer.parseInt(orderId)));
         return ResponseEntity.ok(true);
     }
 
@@ -73,6 +73,15 @@ public class OrderItemController {
         log.info("Boolean, resource; delete orderItem by id");
         this.orderItemService.deleteById(orderItemId);
         return ResponseEntity.ok(true);
+    }
+
+    @ExceptionHandler(com.ecommerce.shippingservice.exception.wrapper.OrderItemNotFoundException.class)
+    public ResponseEntity<com.ecommerce.shippingservice.exception.payload.ExceptionMsg> handleNotFound(
+            final com.ecommerce.shippingservice.exception.wrapper.OrderItemNotFoundException ex) {
+        log.warn("OrderItem not found: {}", ex.getMessage());
+        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .body(new com.ecommerce.shippingservice.exception.payload.ExceptionMsg(
+                        java.time.ZonedDateTime.now(), null, org.springframework.http.HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
 }

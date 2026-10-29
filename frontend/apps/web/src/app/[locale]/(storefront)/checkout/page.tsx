@@ -68,18 +68,20 @@ export default function CheckoutPage() {
     try {
       const firstItem = items[0];
       const orderRes = await orderApi.create({
-        orderDate: new Date().toISOString(),
         orderDesc: shipping.note || "EzBuy order",
         orderFee: total,
         productId: firstItem.product.productId,
       });
-      const newOrderId = orderRes.data?.data?.orderId;
-      await paymentApi.create({
-        isPayed: paymentMethod !== "COD",
-        paymentStatus: paymentMethod === "COD" ? "NOT_STARTED" : "IN_PROGRESS",
-        orderId: newOrderId,
-      });
-      setOrderId(newOrderId);
+      const orderData = orderRes.data as { orderId?: number; data?: { orderId?: number } };
+      const newOrderId = orderData?.orderId ?? orderData?.data?.orderId;
+      if (newOrderId) {
+        await paymentApi.create({
+          isPayed: paymentMethod !== "COD",
+          paymentStatus: paymentMethod === "COD" ? "NOT_STARTED" : "IN_PROGRESS",
+          orderId: newOrderId,
+        });
+        setOrderId(newOrderId);
+      }
       clearCart();
       setStep(3);
     } catch {

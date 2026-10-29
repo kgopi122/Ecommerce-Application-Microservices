@@ -52,20 +52,24 @@ public class ProductService {
                 .withAggregation("attributes", Aggregation.of(a -> a
                         .terms(ta -> ta.field(ProductField.ATTRIBUTES))))
                 .withAggregation("brands", Aggregation.of(a -> a
-                        .terms(ta -> ta.field(ProductField.BRAND))))
-                .withQuery(q -> q
-                        .bool(b -> b
-                                .should(s -> s
-                                        .multiMatch(m -> m
-                                                .fields(ProductField.NAME, ProductField.BRAND)
-                                                .query(keyword)
-                                                .fuzziness(Fuzziness.ONE.asString())
-                                        )
-                                )
-                        )
-                )
-                .withPageable(PageRequest.of(page, size));
+                        .terms(ta -> ta.field(ProductField.BRAND))));
+        if (keyword != null && !keyword.isBlank()) {
+            nativeQuery.withQuery(q -> q
+                    .bool(b -> b
+                            .should(s -> s
+                                    .multiMatch(m -> m
+                                            .fields(ProductField.NAME, ProductField.BRAND)
+                                            .query(keyword)
+                                            .fuzziness(Fuzziness.ONE.asString())
+                                    )
+                            )
+                    )
+            );
+        } else {
+            nativeQuery.withQuery(q -> q.matchAll(m -> m));
+        }
 
+        nativeQuery.withPageable(PageRequest.of(page, size));
 
         nativeQuery.withFilter(f -> f
                 .bool(b -> {
@@ -104,15 +108,23 @@ public class ProductService {
     private void extractedStr(String strField, String productField, BoolQuery.Builder b) {
         if (strField != null && !strField.isBlank()) {
             String[] strFields = strField.split(",");
-            for (String str : strFields) {
-                b.should(s -> s
-                        .term(t -> t
-                                .field(productField)
-                                .value(str)
-                                .caseInsensitive(true)
-                        )
-                );
-            }
+            b.must(m -> m
+                    .bool(innerBool -> {
+                        for (String str : strFields) {
+                            String trimmed = str.trim();
+                            if (!trimmed.isEmpty()) {
+                                innerBool.should(s -> s
+                                        .term(t -> t
+                                                .field(productField)
+                                                .value(trimmed)
+                                                .caseInsensitive(true)
+                                        )
+                                );
+                            }
+                        }
+                        return innerBool;
+                    })
+            );
         }
     }
 

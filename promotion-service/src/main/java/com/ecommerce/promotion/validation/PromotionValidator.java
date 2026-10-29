@@ -18,9 +18,14 @@ public class PromotionValidator implements ConstraintValidator<PromotionConstrai
 
     @Override
     public boolean isValid(PromotionDto promotionDto, ConstraintValidatorContext constraintValidatorContext) {
+        if (promotionDto == null) {
+            return false;
+        }
         boolean isValid = true;
         if (UsageType.LIMITED.equals(promotionDto.getUsageType())) {
             isValid = promotionDto.getUsageLimit() > 0;
+        } else if (promotionDto.getUsageType() == null) {
+            isValid = false;
         }
 
         isValid = isValid && isValidDiscountType(promotionDto);
@@ -31,14 +36,21 @@ public class PromotionValidator implements ConstraintValidator<PromotionConstrai
     }
 
     private static boolean isValidDiscountType(PromotionDto promotion) {
-        if (DiscountType.FIXED.equals(promotion.getDiscountType())) {
-            return promotion.getDiscountAmount() > 0;
-        } else {
-            return promotion.getDiscountPercentage() > 0;
+        if (promotion.getDiscountType() == null) {
+            return false;
         }
+        if (DiscountType.FIXED.equals(promotion.getDiscountType())) {
+            return promotion.getDiscountAmount() != null && promotion.getDiscountAmount() > 0;
+        } else if (DiscountType.PERCENTAGE.equals(promotion.getDiscountType())) {
+            return promotion.getDiscountPercentage() != null && promotion.getDiscountPercentage() > 0;
+        }
+        return false;
     }
 
     private static boolean isValidApplyToItems(PromotionDto promotion, boolean isValid) {
+        if (promotion.getApplyTo() == null) {
+            return false;
+        }
         return switch (promotion.getApplyTo()) {
             case PRODUCT -> isValid && CollectionUtils.isNotEmpty(promotion.getProductIds());
             case BRAND -> isValid && CollectionUtils.isNotEmpty(promotion.getBrandIds());

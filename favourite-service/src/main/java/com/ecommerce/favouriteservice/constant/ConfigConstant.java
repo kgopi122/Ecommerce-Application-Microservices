@@ -16,8 +16,8 @@ public abstract class ConfigConstant {
         public static final String USER_SERVICE_HOST = "http://AUTH-SERVICE/auth-service";
         public static final String USER_SERVICE_API_URL = "http://AUTH-SERVICE/auth-service/api/users";
 
-        public static final String PRODUCT_SERVICE_HOST = "http://PRODUCT-SERVICE/product-service";
-        public static final String PRODUCT_SERVICE_API_URL = "http://PRODUCT-SERVICE/product-service/api/products";
+        public static final String PRODUCT_SERVICE_HOST = System.getenv().getOrDefault("PRODUCT_SERVICE_HOST", "http://product-service:8086/product");
+        public static final String PRODUCT_SERVICE_API_URL = System.getenv().getOrDefault("PRODUCT_SERVICE_API_URL", "http://product-service:8086/product/api/products");
 
         public static final String ORDER_SERVICE_HOST = "http://ORDER-SERVICE/order-service";
         public static final String ORDER_SERVICE_API_URL = "http://ORDER-SERVICE/order-service/api/orders";

@@ -7,6 +7,7 @@ import { Plus, Edit, Trash2, Tag } from "lucide-react";
 import { categoryApi } from "@ecommerce/lib/api";
 import { useCategories } from "@/hooks";
 import { Button, Input, Modal, ModalBody, ModalFooter } from "@ecommerce/ui";
+import { extractList } from "@ecommerce/lib/utils";
 import type { Category } from "@ecommerce/lib/types";
 import { categoriesStyles as s } from "./categories.styles";
 
@@ -34,7 +35,7 @@ export default function AdminCategoriesPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 
-  const categories = data?.data?.content ?? [];
+  const categories = extractList<Category>(data);
 
   const openAdd = () => {
     setEditItem(null);

@@ -120,6 +120,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String userName) {
         return userRepository.findByUsername(userName)
+                .or(() -> userRepository.findByKeycloakUserId(userName))
                 .orElseThrow(() -> BusinessException.notFound("auth.user.not.found.with.username", userName));
     }
 

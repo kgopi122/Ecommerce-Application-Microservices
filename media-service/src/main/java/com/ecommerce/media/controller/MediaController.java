@@ -90,6 +90,9 @@ public class MediaController {
     @GetMapping("/medias/{id}/file/{fileName}")
     public ResponseEntity<InputStreamResource> getFile(@PathVariable Long id, @PathVariable String fileName) {
         MediaDto mediaDto = mediaService.getFile(id, fileName);
+        if (mediaDto == null || mediaDto.getContent() == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")

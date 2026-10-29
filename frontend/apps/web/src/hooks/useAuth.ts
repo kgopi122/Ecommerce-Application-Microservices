@@ -54,12 +54,31 @@ export function useSsoCallback() {
         // Set the token first so getProfile()'s interceptor can attach it.
         localStorage.setItem("access_token", tokens.access_token);
 
-        let user = { id: 0, fullName: "", username: "", email: "", gender: "", roles: [] };
+        let user: any = { id: 0, fullName: "", username: "", email: "", gender: "", roles: [] };
         try {
           const profileRes = await authApi.getProfile();
           if (profileRes.data?.data) user = profileRes.data.data;
         } catch {
           /* profile is best-effort; the token alone is enough to be logged in */
+        }
+
+        if (!user.username && tokens.access_token) {
+          try {
+            const parts = tokens.access_token.split(".");
+            if (parts.length >= 2) {
+              const base64Url = parts[1];
+              const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+              const payload = JSON.parse(decodeURIComponent(escape(atob(base64))));
+              user.username = payload.preferred_username || payload.sub || "";
+              user.email = payload.email || "";
+              user.fullName = payload.name || payload.given_name || payload.preferred_username || "";
+              if (payload.realm_access?.roles) {
+                user.roles = payload.realm_access.roles;
+              }
+            }
+          } catch {
+            /* ignore decode error */
+          }
         }
 
         setAuth(user, tokens.access_token, tokens.refresh_token);

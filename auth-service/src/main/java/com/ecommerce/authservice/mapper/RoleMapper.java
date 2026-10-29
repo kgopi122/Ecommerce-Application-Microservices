@@ -9,8 +9,15 @@ public final class RoleMapper {
     }
 
     public static RoleName toRoleName(String roleName) {
+        if (roleName == null) {
+            throw BusinessException.badRequest("auth.unsupported.role", "null");
+        }
+        String clean = roleName.replace("\"", "").trim().toUpperCase();
+        if (clean.startsWith("ROLE_")) {
+            clean = clean.substring(5);
+        }
         try {
-            return RoleName.valueOf(roleName.toUpperCase());
+            return RoleName.valueOf(clean);
         } catch (IllegalArgumentException e) {
             throw BusinessException.badRequest("auth.unsupported.role", roleName);
         }

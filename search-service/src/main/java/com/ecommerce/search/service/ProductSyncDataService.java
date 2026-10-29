@@ -63,6 +63,7 @@ public class ProductSyncDataService {
                 .brand(productEsDetailVm.brand())
                 .categories(productEsDetailVm.categories())
                 .attributes(productEsDetailVm.attributes())
+                .createdOn(java.time.ZonedDateTime.now())
                 .build();
 
         productRepository.save(product);

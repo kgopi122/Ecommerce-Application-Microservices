@@ -1,11 +1,10 @@
 import Image from "next/image";
 import { Heart, ShoppingCart, Star } from "lucide-react";
-import { cn } from "@ecommerce/lib/utils";
-import { formatPrice } from "@ecommerce/lib/utils";
+import { cn, formatPrice, resolveProductImageUrl, DEFAULT_PRODUCT_FALLBACK_SVG } from "@ecommerce/lib/utils";
 import type { Product } from "@ecommerce/lib/types";
 import { productStyles as s } from "./product.styles";
 
-interface ProductCardProps {
+export interface ProductCardProps {
   product: Product;
   wishlisted?: boolean;
   onWishlist?: (e: React.MouseEvent) => void;
@@ -15,18 +14,19 @@ interface ProductCardProps {
 }
 
 export function ProductImage({ product }: { product: Product }) {
-  return product.imageUrl ? (
+  const imageUrl = resolveProductImageUrl(product.imageUrl, product.productTitle, product.category?.categoryTitle);
+  return (
     <Image
-      src={product.imageUrl}
+      src={imageUrl}
       alt={product.productTitle}
       fill
+      unoptimized
       className="object-cover group-hover:scale-105 transition-transform duration-300"
       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+      onError={(e) => {
+        (e.currentTarget as HTMLImageElement).src = DEFAULT_PRODUCT_FALLBACK_SVG;
+      }}
     />
-  ) : (
-    <div className={s.imagePlaceholder}>
-      <ShoppingCart className="h-12 w-12 text-primary-300" />
-    </div>
   );
 }
 

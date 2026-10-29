@@ -41,7 +41,7 @@ public final class Order extends AbstractMappedEntity {
     @Column(name = "order_desc")
     private String orderDesc;
 
-    @Column(name = "order_fee", columnDefinition = "decimal")
+    @Column(name = "order_fee")
     private Double orderFee;
 
     @Column(name = "product_id")

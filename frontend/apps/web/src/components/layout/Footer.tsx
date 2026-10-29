@@ -39,7 +39,7 @@ export default function Footer() {
           <div>
             <h3 className={s.colTitle}>{t("infoTitle")}</h3>
             {infoLinks.map(({ href, label }) => (
-              <Link key={href} href={href} className={s.link}>{label}</Link>
+              <Link key={href} href={href} prefetch={false} className={s.link}>{label}</Link>
             ))}
           </div>
 
@@ -47,7 +47,7 @@ export default function Footer() {
           <div>
             <h3 className={s.colTitle}>{t("aboutUs")}</h3>
             {aboutLinks.map(({ href, label }) => (
-              <Link key={href} href={href} className={s.link}>{label}</Link>
+              <Link key={href} href={href} prefetch={false} className={s.link}>{label}</Link>
             ))}
           </div>
 
@@ -58,7 +58,7 @@ export default function Footer() {
               <MapPin className="h-4 w-4 text-primary-500 shrink-0 mt-0.5" />
               {t("storeDesc")}
             </p>
-            <Link href="/stores" className={s.link}>{t("viewStores")}</Link>
+            <Link href="/stores" prefetch={false} className={s.link}>{t("viewStores")}</Link>
             <h3 className={`${s.colTitle} mt-4`}>{t("paymentTitle")}</h3>
             <div className={s.payRow}>
               {["VISA", "MOMO", "VNPAY", "ZALOPAY", "COD"].map((p) => (
@@ -95,8 +95,8 @@ export default function Footer() {
             {t("copyright")}
           </span>
           <div className={s.bottomLinks}>
-            <Link href="/privacy" className="hover:text-primary-600">{t("privacy")}</Link>
-            <Link href="/terms" className="hover:text-primary-600">{t("terms")}</Link>
+            <Link href="/privacy" prefetch={false} className="hover:text-primary-600">{t("privacy")}</Link>
+            <Link href="/terms" prefetch={false} className="hover:text-primary-600">{t("terms")}</Link>
             <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {t("phone")}</span>
           </div>
         </div>

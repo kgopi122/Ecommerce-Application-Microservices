@@ -22,7 +22,7 @@ export async function generateMetadata({
       template: `%s | EzBuy`,
     },
     description: t("metaDesc"),
-    keywords: ["mua sắm online", "thương mại điện tử", "ecommerce"],
+    keywords: ["online shopping", "electronics", "ecommerce", "gadgets"],
   };
 }
 
@@ -38,13 +38,16 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!(routing.locales as readonly string[]).includes(locale)) notFound();
+
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
 
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={geist.variable}>
-      <body className="min-h-screen bg-gray-50 antialiased">
+    <html lang={locale} className={geist.variable} suppressHydrationWarning>
+      <body className="antialiased min-h-screen flex flex-col bg-gray-50 text-gray-900">
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>

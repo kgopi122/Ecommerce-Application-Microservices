@@ -14,16 +14,18 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Inventory inventory = new Inventory();
-        inventory.setProductName("Iphone 13");
-        inventory.setQuantity(12);
+        if (inventoryRepository.count() == 0) {
+            Inventory inventory = new Inventory();
+            inventory.setProductName("Iphone 13");
+            inventory.setQuantity(12);
 
-        Inventory inventory1 = new Inventory();
-        inventory1.setProductName("Macbook Pro 13.3");
-        inventory1.setQuantity(4);
+            Inventory inventory1 = new Inventory();
+            inventory1.setProductName("Macbook Pro 13.3");
+            inventory1.setQuantity(4);
 
-        inventoryRepository.save(inventory);
-        inventoryRepository.save(inventory1);
+            inventoryRepository.save(inventory);
+            inventoryRepository.save(inventory1);
+        }
     }
 
 }

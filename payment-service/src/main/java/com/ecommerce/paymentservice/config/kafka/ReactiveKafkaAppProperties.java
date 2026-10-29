@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ReactiveKafkaAppProperties {
-    @Value("${kafka.bootstrap.servers}")
+    @Value("${spring.kafka.bootstrap-servers:${KAFKA_SERVERS:localhost:9092}}")
     String bootstrapServers;
 
-    @Value("${payment.kafka.consumer-group-id}")
+    @Value("${payment.kafka.consumer-group-id:payment-groupId}")
     String consumerGroupId;
 }

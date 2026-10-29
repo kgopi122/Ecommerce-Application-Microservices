@@ -7,8 +7,8 @@ import { Plus, Edit, Trash2, Package } from "lucide-react";
 import { useAdminProducts, useCategories } from "@/hooks";
 import { productApi } from "@ecommerce/lib/api";
 import { Button, Badge, DataTable, Modal, ModalBody, ModalFooter, Input } from "@ecommerce/ui";
-import { formatPrice } from "@ecommerce/lib/utils";
-import type { Product } from "@ecommerce/lib/types";
+import { formatPrice, extractList } from "@ecommerce/lib/utils";
+import type { Product, Category } from "@ecommerce/lib/types";
 import { productsStyles as s } from "./products.styles";
 
 type ProductForm = {
@@ -46,9 +46,9 @@ export default function AdminProductsPage() {
     },
   });
 
-  const products = data?.data?.content ?? [];
-  const totalPages = data?.data?.totalPages ?? 0;
-  const categories = categoriesData?.data?.content ?? [];
+  const products = extractList<Product>(data);
+  const categories = extractList<Category>(categoriesData);
+  const totalPages = data?.data?.totalPages ?? (products.length > 0 ? Math.ceil(products.length / 10) : 0);
 
   const openAdd = () => {
     setEditProduct(null);
