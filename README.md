@@ -88,7 +88,7 @@ The project is intended for learning, development, integration testing, and demo
 - Redis caching
 - S3-compatible object storage through RustFS
 - Containerized development environment
-- Automated service startup and dependency management through Docker Compose
+- Automated service startup  and dependency management through Docker Compose
 
 *Feature availability depends on the current implementation of each service. See Known Limitations before treating the platform as production-ready.*
 
